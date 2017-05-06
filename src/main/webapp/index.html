@@ -1,0 +1,95 @@
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Hello App Engine</title>
+    
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular-route.js"></script>
+    <script>
+        /**
+         * Initializes the Google API JavaScript client. Bootstrap the angular module after loading the Google libraries
+         * so that Google JavaScript library ready in the angular modules.
+         */
+        function init() {
+            gapi.client.load('libreriapp', 'v1', null, 'http://localhost:9991/_ah/api');
+        };
+    </script>
+    <script src="js/app.js"></script>
+	<script src="js/controllers.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+    
+  </head>
+
+  <body ng-app="libreriappControllers">
+    <h1>Hello App Engine!</h1>
+    
+    <div ng-controller="listBooksCtrl">
+	Hola
+	<ul>
+	  <li ng-repeat="x in thebooks">
+	    {{ x.name + ', ' + x.author }}
+	    <br />
+	    {{x}}
+	  </li>
+	</ul>
+	</div>
+  
+    <table>
+      <tr>
+        <td colspan="2" style="font-weight:bold;">Available Servlets:</td>        
+      </tr>
+      <tr>
+        <td><a href='#'>The servlet</a></td>
+      </tr>
+    </table>
+    <form action="#" method="post" name="fillPerson">
+
+		Nombre: <input name="name" type="text" /> <br />
+		Apellido: <input name="lastName" type="text" /> <br />
+		E-mail: <input name="email" type="text" /> <br />
+		Password: <input name="password" type="password" /> <br />
+		<input name="submit" type="submit" value="Enviar" /> <br />
+	
+	</form>
+	<br />
+	<p>Consulte todos los usuarios guardados, clic </p><a href='/other'>Aquí</a>
+	<br />
+	<br />
+	<p>Agrege libros</p>
+	<form action="#" method="get" name="formBooks">
+		Nombre:	<input name="name" type="text" /> <br />
+		Autor: <input name="author" type="text" /> <br />
+		Páginas: <input name="pages" type="text" /> <br />
+		Tema: <input name="topic" type="text" /> <br />
+		Precio: <input name="price" type="text" /> <br />
+		Email Persona: <input name="emailPerson" type="text" /> <br />
+		<input name="submit" type="submit" value="Enviar" />
+	</form>
+	<br />
+	<p>Consulte todos los libros guardados, clic <a href='#'>Aquí</a></p>
+	<br />
+	<br />
+	<p>Consulte todos los libros de un usuario</p>
+	<br />
+	<form action="#" method="get" name="emailBooks">
+		Email:	<input name="email" type="text" />
+		<input name="submit" type="submit" value="Enviar" />
+	</form>
+    
+    <form ng-submit="listAllBooks()" ng-controller="listBooksCtrl">
+        <div><input id="listBooks" type="submit" value="Obtener los libros"></div>
+        <h1>Todos los libros</h1>
+        {{justtest}}
+        <h2>List Books - Uno por uno</h2>
+        <ul>
+		  <li ng-repeat="x in thebooks">
+		    {{ x.name + ', ' + x.author }}
+		  </li>
+		</ul>
+    </form>
+	
+  </body>
+</html>
