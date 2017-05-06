@@ -30,13 +30,24 @@ public class Book implements Serializable
 	@Index private double reputation;
 	@Index private boolean exchange;
 	@Index private boolean forSale;
-	private int copies;
 	private int condition; // 1- 10
 	@ApiResourceProperty(ignored = AnnotationBoolean.TRUE) 
 	private @Load Ref<Person> person;
 	private byte[] picture1;
 	private byte[] picture2;
 	private byte[] picture3;
+	
+	//For exchanges
+	private boolean confirmVendor;
+	private boolean confirmPurchaser;
+	private boolean isAvailable = true;
+	
+	//si buy es true lo quieren comprar, sino es intercambio es false
+	private String emailPurchaser;
+	private boolean buy; //identifica si lo compraron o lo intercambiaron
+	
+	//Solo para intercambios
+	private Long offeredBook;
 	
 	public Book(){};
 	
@@ -56,7 +67,7 @@ public class Book implements Serializable
 	}
 	
 	public Book(String name, String isbn, String author, String topic, String editorial, int pages,
-			double price, boolean exchange, boolean forSale, int copies, int condition) {
+			double price, boolean exchange, boolean forSale, int condition) {
 		this.name = name;
 		this.isbn = isbn;
 		this.author = author;
@@ -66,12 +77,11 @@ public class Book implements Serializable
 		this.price = price;
 		this.exchange = exchange;
 		this.forSale = forSale;
-		this.copies = copies;
 		this.condition = condition;
 	}
 	
 	public Book(Long id, String name, String isbn, String author, String topic, String editorial, int pages,
-			double price, double reputation, boolean exchange, boolean forSale, int copies, int condition) {
+			double price, double reputation, boolean exchange, boolean forSale, int condition) {
 		this.id = id;
 		this.name = name;
 		this.isbn = isbn;
@@ -83,7 +93,6 @@ public class Book implements Serializable
 		this.reputation = reputation;
 		this.exchange = exchange;
 		this.forSale = forSale;
-		this.copies = copies;
 		this.condition = condition;
 	}
 	
@@ -183,14 +192,6 @@ public class Book implements Serializable
 		this.forSale = forSale;
 	}
 	
-	public int getCopies() {
-		return copies;
-	}
-	
-	public void setCopies(int copies) {
-		this.copies = copies;
-	}
-	
 	public int getCondition() {
 		return condition;
 	}
@@ -231,6 +232,54 @@ public class Book implements Serializable
 
 	public void setPicture3(byte[] picture3) {
 		this.picture3 = picture3;
+	}
+
+	public boolean isConfirmVendor() {
+		return confirmVendor;
+	}
+
+	public void setConfirmVendor(boolean confirmVendor) {
+		this.confirmVendor = confirmVendor;
+	}
+
+	public boolean isConfirmPurchaser() {
+		return confirmPurchaser;
+	}
+
+	public void setConfirmPurchaser(boolean confirmPurchaser) {
+		this.confirmPurchaser = confirmPurchaser;
+	}
+
+	public boolean isAvailable() {
+		return isAvailable;
+	}
+
+	public void setAvailable(boolean isAvailable) {
+		this.isAvailable = isAvailable;
+	}
+
+	public String getEmailPurchaser() {
+		return emailPurchaser;
+	}
+
+	public void setEmailPurchaser(String emailPurchaser) {
+		this.emailPurchaser = emailPurchaser;
+	}
+
+	public boolean isBuy() {
+		return buy;
+	}
+
+	public void setBuy(boolean buy) {
+		this.buy = buy;
+	}
+
+	public Long getOfferedBook() {
+		return offeredBook;
+	}
+
+	public void setOfferedBook(Long offeredBook) {
+		this.offeredBook = offeredBook;
 	}
 
 	@Override

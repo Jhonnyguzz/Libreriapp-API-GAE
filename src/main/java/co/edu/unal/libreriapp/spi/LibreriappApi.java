@@ -14,7 +14,9 @@ import co.edu.unal.libreriapp.dao.PersonDAO;
 import co.edu.unal.libreriapp.form.BookForm;
 import co.edu.unal.libreriapp.form.PersonForm;
 import co.edu.unal.libreriapp.model.Book;
+import co.edu.unal.libreriapp.model.ContactForm;
 import co.edu.unal.libreriapp.model.Person;
+import co.edu.unal.libreriapp.model.Transaction;
 //import com.google.api.client.googleapis.auth.oauth2.;
 import co.edu.unal.libreriapp.util.Constants;
 
@@ -95,19 +97,14 @@ public class LibreriappApi
     }
 	
 	@ApiMethod(name = "saveBook", path = "saveBook", httpMethod = HttpMethod.POST)
-	public void saveBook(@Named("email") String email, BookForm bookForm) {		
+	public void saveBook(@Named("email") String email, BookForm bookForm) throws Exception {		
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
 		
 		if(person==null) {
 			System.err.println("El usuario no existe en el base de datos");
-			try {
-				throw new Exception("User does not exist in database");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			throw new Exception("User does not exist in database");
 		}
 		
 		//TODO Settear los otros valores
@@ -127,13 +124,12 @@ public class LibreriappApi
 		int pages = bookForm.getPages();
 		boolean exchange = bookForm.isExchange();
 		boolean forSale = bookForm.isForSale();
-		int copies = bookForm.getCopies();
-		int state = bookForm.getState();
+		int condition = bookForm.getCondition();
 		
 		String description = bookForm.getDescription();
 		
 		//Book boo = new Book(name, author, topic, price);
-		Book boo = new Book(name,isbn, author, topic, editorial, pages, price, exchange, forSale, copies, state);
+		Book boo = new Book(name, isbn, author, topic, editorial, pages, price, exchange, forSale, condition);
 		boo.setDescription(description);
 		boo.setPerson(Ref.create(person));
 		BookDAO bookDao = new BookDAO();
@@ -142,11 +138,48 @@ public class LibreriappApi
 		dao.save(person);
     }
 	
+	@ApiMethod(name = "editBook", path = "editBook", httpMethod = HttpMethod.POST)
+	public void editBook(@Named("email") String email, @Named("bookId") Long bookId, BookForm bookForm) throws Exception {		
+		
+		PersonDAO dao = new PersonDAO();
+		Person person = dao.load(email);
+		
+		BookDAO bookDao = new BookDAO();
+		Book boo = bookDao.load(bookId);
+		
+		if(person==null || boo == null) {
+			System.err.println("El usuario o el libro no existe en el base de datos");
+			throw new Exception("User or book does not exist in database");
+		}
+		
+		System.err.println(email);
+		System.err.println(boo.getPerson().get().getEmail());
+		
+		if(!email.equals(boo.getPerson().get().getEmail())) {
+			System.err.println("El libro no pertenece a este usuario");
+			throw new Exception("El libro no pertenece a este usuario");
+		}
+		
+		//TODO Settear los otros valores
+		double price = bookForm.getPrice();
+		boolean exchange = bookForm.isExchange();
+		boolean forSale = bookForm.isForSale();
+		String description = bookForm.getDescription();
+		
+		boo.setPrice(price);
+		boo.setExchange(exchange);
+		boo.setForSale(forSale);
+		boo.setDescription(description);
+		
+		bookDao.save(boo);
+    }
+	
 	/**
 	 * Delete de book with id
+	 * @throws Exception 
 	 */
 	@ApiMethod(name = "deleteBook", path = "deleteBook", httpMethod = HttpMethod.POST)
-	public void deleteBook(@Named("email") String email, @Named("bookid") Long bookId) {		
+	public void deleteBook(@Named("email") String email, @Named("bookid") Long bookId) throws Exception {		
 		
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
@@ -156,37 +189,29 @@ public class LibreriappApi
 		
 		if(person == null || book == null) {
 			System.err.println("El usuario o el libro no existe en base de datos");
-			try {
-				throw new Exception("User does not exist in database or book does not exist");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			throw new Exception("User does not exist in database or book does not exist");
 		}
 		
 		if(person.deleteBook(book))
 			daob.remove(book);
-		else
+		else {
 			System.err.println("El libro no pertenece a ese usuario");
+			throw new Exception("El libro no pertenece a ese usuario");
+		}
 		daop.save(person);
 		
 		System.err.println("Operacion borrar libro realizada");
     }
 	
 	@ApiMethod(name = "myBooks", path = "myBooks", httpMethod = HttpMethod.POST)
-	public List<Book> myBooks(@Named("email") String email) {		
+	public List<Book> myBooks(@Named("email") String email) throws Exception {		
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
 		
 		if(person==null) {
 			System.err.println("El usuario no existe en el base de datos");
-			try {
-				throw new Exception("User does not exist in database");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			throw new Exception("User does not exist in database");
 		}
 		
 		List<Ref<Book>> myRefBooks = person.getMyBooks();
@@ -200,28 +225,214 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "purchase", path = "purchase", httpMethod = HttpMethod.POST)
-	public void purchase(@Named("email") String email) {		
+	public ContactForm purchase(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") Long bookId) throws Exception {		
 		//TODO Retorna una clase diferente que no persista con los datos de usuario
-		PersonDAO dao = new PersonDAO();
-		Person person = dao.load(email);
+		BookDAO daob = new BookDAO();
+		PersonDAO daop = new PersonDAO();
 		
-		if(person==null) {
-			System.err.println("El usuario no existe en el base de datos");
+		Person person = daop.load(emailPurchaser);
+		Book book = daob.load(bookId);
+		
+		if(person == null || book == null) {
+			System.err.println("El usuario o el libro no existe en base de datos");
+			throw new Exception("User does not exist in database or book does not exist");
+		}
+		
+		if(!book.isForSale())
+			throw new Exception("El libro no está disponible para compra");
+		
+		//Confirmo que el comprador compra en el libro
+		book.setConfirmPurchaser(true);	
+		book.setAvailable(false);
+		book.setEmailPurchaser(emailPurchaser);
+		
+		daob.save(book);
+		
+		ContactForm contactForm = new ContactForm(person.getEmail(),book.getPerson().get().getEmail());
+		return contactForm;
+		
+	}
+	
+	@ApiMethod(name = "confirmPurchase", path = "confirmPurchase", httpMethod = HttpMethod.POST)
+	public void confirmPurchase(@Named("emailVendor") String emailVendor, @Named("bookid") Long bookId, Transaction transaction) throws Exception {		
+		
+		//El Id del libro debe tener un confirm en true que indica que alguien lo desea
+		
+		PersonDAO daop = new PersonDAO();
+		Person vendor = daop.load(emailVendor);
+		
+		BookDAO daob = new BookDAO();
+		Book book = daob.load(bookId);
+		
+		if(book == null) {
+			System.err.println("El libro no existe en base de datos");
+			throw new Exception("User does not exist in database or book does not exist");
+		}
+		
+		if(!book.isConfirmPurchaser()) {
 			try {
-				throw new Exception("User does not exist in database");
+				throw new Exception("El libro aun no lo compran o no lo desean intercambiar");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		
-		List<Ref<Book>> myRefBooks = person.getMyBooks();
-		List<Book> myOwnBooks = new ArrayList<>();
-		
-		for (Ref<Book> obj : myRefBooks) {
-			myOwnBooks.add(obj.get());
+		if(!emailVendor.equals(book.getPerson().get().getEmail())) {
+			System.err.println("El libro no pertenece a ese vendedor");
+			throw new Exception("El libro no pertenece a ese vendedor");
 		}
 		
+		if(transaction.isConfirm()) {
+			//Confirmo que el vendedor vende el libro
+			book.setConfirmVendor(true);
+			book.setAvailable(false);
+			
+			//Se hace el intercambio
+			String emailNewOwner = book.getEmailPurchaser();
+			
+			Person owner = daop.load(emailNewOwner);
+			
+			//Nuevo dueño
+			book.setPerson(Ref.create(owner));
+			book.setBuy(true);
+			book.setEmailPurchaser("");
+			
+			daob.save(book);
+			
+			owner.addBook(book);
+			vendor.deleteBook(book);
+			
+			daop.save(owner);
+			daop.save(vendor);	
+			
+			System.err.println("El vendedor confirmo la transaccion");
+			
+		}else {
+			book.setAvailable(true);
+			book.setConfirmPurchaser(false);
+			book.setConfirmVendor(false);
+			book.setEmailPurchaser("");
+			daob.save(book);
+			System.err.println("El vendedor cancelo la transaccion, volviendo a publicar...");
+		}
+	}
+	
+	@ApiMethod(name = "exchange", path = "exchange", httpMethod = HttpMethod.POST)
+	public ContactForm exchange(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") Long bookId, @Named("myoffer") Long myOfferBookId) throws Exception {		
+		//TODO Retorna una clase diferente que no persista con los datos de usuario
+		BookDAO daob = new BookDAO();
+		PersonDAO daop = new PersonDAO();
+		
+		Person person = daop.load(emailPurchaser);
+		Book bookWanted = daob.load(bookId);
+		Book myBookOffer = daob.load(myOfferBookId);
+		
+		
+		if(person == null || bookWanted == null || myBookOffer == null) {
+			System.err.println("El usuario o los libros no existen en base de datos");
+			throw new Exception("User does not exist in database or books do not exist");
+
+		}
+		
+		if(!emailPurchaser.equals(myBookOffer.getPerson().get().getEmail())) {
+			System.err.println("El libro no pertenece a ese vendedor");
+			throw new Exception("El libro no pertenece a ese vendedor");
+		}
+		
+		if(!myBookOffer.isExchange() || !myBookOffer.isAvailable() || !bookWanted.isExchange()) {
+			System.err.println("El libro no está disponible para intercambiar");
+			throw new Exception("El libro no está disponible para intercambiar");
+		}
+		
+		//Confirmo que el comprador compra en el libro
+		bookWanted.setConfirmPurchaser(true);	
+		bookWanted.setAvailable(false);
+		bookWanted.setEmailPurchaser(emailPurchaser);
+		bookWanted.setOfferedBook(myOfferBookId);
+		
+		daob.save(bookWanted);
+		
+		ContactForm contactForm = new ContactForm(person.getEmail(),bookWanted.getPerson().get().getEmail());
+		return contactForm;	
+	}
+	
+	@ApiMethod(name = "confirmExchange", path = "confirmExchange", httpMethod = HttpMethod.POST)
+	public void confirmExchange(@Named("emailVendor") String emailVendor, @Named("bookid") Long bookId, Transaction transaction) throws Exception {		
+		
+		//El Id del libro debe tener un confirm en true que indica que alguien lo desea
+		
+		PersonDAO daop = new PersonDAO();
+		Person vendor = daop.load(emailVendor);
+	
+		BookDAO daob = new BookDAO();
+		Book book = daob.load(bookId);
+		
+		if(book == null || vendor==null) {
+			System.err.println("El libro o usuario no existe en base de datos");
+			throw new Exception("User does not exist in database or book does not exist");
+		}
+		
+		if(!emailVendor.equals(book.getPerson().get().getEmail())) {
+			System.err.println("El libro no pertenece a ese vendedor");
+			throw new Exception("El libro no pertenece a ese vendedor");
+		}
+		
+		if(!book.isConfirmPurchaser()) {
+			throw new Exception("El libro aun no lo compran o no lo desean intercambiar");
+		}
+		
+		if(transaction.isConfirm()) {
+			//Confirmo que el vendedor vende el libro
+			book.setConfirmVendor(true);
+			book.setAvailable(false);
+			
+			//Se hace el intercambio
+			String emailNewOwner = book.getEmailPurchaser();
+			
+			Person owner = daop.load(emailNewOwner);
+			
+			//Obteniendo el libro que ofrece el comprador
+			Book bookForVendor = daob.load(book.getOfferedBook());
+			
+			//Nuevo dueño
+			book.setPerson(Ref.create(owner));
+			book.setBuy(false);
+			book.setOfferedBook(0L);
+			book.setEmailPurchaser("");
+			
+			daob.save(book);
+			
+			owner.addBook(book);
+			vendor.deleteBook(book);
+			
+			owner.deleteBook(bookForVendor);
+			
+			daop.save(owner);
+			
+			//Agregando el libro al vendedor
+			bookForVendor.setConfirmPurchaser(true);
+			bookForVendor.setConfirmVendor(true);
+			bookForVendor.setAvailable(false);
+			bookForVendor.setOfferedBook(0L);
+			bookForVendor.setEmailPurchaser("");
+			bookForVendor.setPerson(Ref.create(vendor));
+			vendor.addBook(bookForVendor);
+			
+			daob.save(bookForVendor);
+			daop.save(vendor);	
+			
+			System.err.println("El vendedor confirmo la transaccion");
+			
+		}else {
+			book.setAvailable(true);
+			book.setConfirmPurchaser(false);
+			book.setConfirmVendor(false);
+			book.setEmailPurchaser("");
+			book.setOfferedBook(0L);
+			daob.save(book);
+			System.err.println("El vendedor cancelo la transaccion, vovliendo a publicar...");
+		}
 	}
 
 }

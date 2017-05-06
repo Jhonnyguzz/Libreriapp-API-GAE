@@ -7,13 +7,12 @@ public class BookForm {
 	private String author;
 	private String topic;
 	private String editorial;
-	private String description;
+	private String description; //edit
 	private int pages;
-	private double price;
-	private boolean exchange;
-	private boolean forSale;
-	private int copies;
-	private int state;
+	private double price;		//edit
+	private boolean exchange;	//edit
+	private boolean forSale;	//edit
+	private int condition;
 	
 	public BookForm(){}
 	
@@ -104,20 +103,12 @@ public class BookForm {
 		this.forSale = forSale;
 	}
 
-	public int getCopies() {
-		return copies;
+	public int getCondition() {
+		return condition;
 	}
 
-	public void setCopies(int copies) {
-		this.copies = copies;
-	}
-
-	public int getState() {
-		return state;
-	}
-
-	public void setState(int state) {
-		this.state = state;
+	public void setCondition(int condition) {
+		this.condition = condition;
 	}
 
 }
