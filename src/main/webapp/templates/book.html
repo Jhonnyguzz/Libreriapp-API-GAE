@@ -3,14 +3,15 @@
 		<div class="list card">
 			<div class="item item-avatar">
 				<p ng-click="listOneBook()">Haz clic por aca para cargar</p>
+				<h2>{{tmp}}</h2>
 				<img ng-src="#">
-				<h2>{{book.name}}</h2>
-				<p>{{book.author}}</p>
+				<h2>{{::book.name}}</h2>
+				<p>{{::book.author}}</p>
 			</div>
 			<div class="item item-body">
 				<img class="full-image" ng-src="https://escritoradebolsillo.files.wordpress.com/2015/06/librosss.jpg">
 				<p>
-					{{book.description}}
+					{{::book.description}}
 				</p>
 				<p class="row">
 					<label class="col">
@@ -18,7 +19,7 @@
 					</label>
 					<label class="col">
 						Precio :
-						<label class="subdued">{{book.price}} $</label>
+						<label class="subdued">{{::book.price}} $</label>
 					</label>
 				</p>
 				<button class="button button-assertive button-block" ng-click="addToCart()">

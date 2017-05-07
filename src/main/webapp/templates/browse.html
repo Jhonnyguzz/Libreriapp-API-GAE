@@ -7,9 +7,9 @@
 				<ion-item class="col-50" ng-repeat="i in [$index, $index + 1]" ng-if="thebooks[i] != null" ng-href="#/app/book/{{::thebooks[i].id}}">
 					<div class="item-thumbnail-left">
 						<img ng-src="https://escritoradebolsillo.files.wordpress.com/2015/06/librosss.jpg">
-						<h2>{{thebooks[i].name}}</h2>
-						<h2>{{thebooks[i].author}}</h2>
-						<p>{{thebooks[i].description}}</p>
+						<h2>{{::thebooks[i].name}}</h2>
+						<h2>{{::thebooks[i].author}}</h2>
+						<p>{{::thebooks[i].description}}</p>
 						<p>
 						 	<!-- Aqui posiblemente va la calificacion del libro --> 
 							<i class="icon ion-star" ng-repeat="i in getNumber(thebooks[i].rating) track by $index"></i>
