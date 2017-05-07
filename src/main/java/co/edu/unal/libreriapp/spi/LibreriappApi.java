@@ -96,6 +96,22 @@ public class LibreriappApi
         return books;
     }
 	
+	@ApiMethod(name = "listOneBook", path = "listOneBook/{BookId}", httpMethod = HttpMethod.POST)
+	public Book listOneBook(@Named("bookId") Long bookId) throws Exception {
+		
+		System.out.println("This is the BookId:" + String.valueOf(bookId));
+		
+        BookDAO bookDao = new BookDAO();
+        Book boo = bookDao.load(bookId);
+        
+        if(boo==null) {
+			System.err.println("El libro no existe en el base de datos");
+			throw new Exception("Book does not exist in database");
+		}
+        System.out.println(boo.toString());
+        return boo;
+    }
+	
 	@ApiMethod(name = "saveBook", path = "saveBook", httpMethod = HttpMethod.POST)
 	public void saveBook(@Named("email") String email, BookForm bookForm) throws Exception {		
 		
