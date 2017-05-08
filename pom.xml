@@ -24,7 +24,8 @@ limitations under the License.
   <artifactId>libreriapp</artifactId>
 
   <properties>
-    <appengine.version>1.9.51</appengine.version>
+  	<appengine.app.version>1</appengine.app.version>
+    <appengine.target.version>1.9.51</appengine.target.version>
     <appengine.maven.plugin.version>1.9.51</appengine.maven.plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -35,7 +36,7 @@ limitations under the License.
 	<!-- <maven.compiler.executable>C:\Program Files\Java\jdk1.8.0_131\bin\javac</maven.compiler.executable> -->
     <archiveClasses>true</archiveClasses>
     <objectify.version>5.1.17</objectify.version>
-    <guava.version>21.0</guava.version>
+    <guava.version>18.0</guava.version>
     <endpoints.framework.version>2.0.0-beta.7</endpoints.framework.version>
     <endpoints.management.version>1.0.0-beta.7</endpoints.management.version>
   </properties>
@@ -49,13 +50,13 @@ limitations under the License.
     <dependency>
       <groupId>com.google.appengine</groupId>
       <artifactId>appengine-api-1.0-sdk</artifactId>
-      <version>${appengine.version}</version>
+      <version>${appengine.target.version}</version>
     </dependency>
     
     <dependency>
       <groupId>com.google.appengine</groupId>
       <artifactId>appengine-endpoints</artifactId>
-      <version>${appengine.version}</version>
+      <version>${appengine.target.version}</version>
     </dependency>
   
     <dependency>
@@ -92,20 +93,20 @@ limitations under the License.
     <dependency>
       <groupId>com.google.appengine</groupId>
       <artifactId>appengine-testing</artifactId>
-      <version>${appengine.version}</version>
+      <version>${appengine.target.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.appengine</groupId>
       <artifactId>appengine-api-stubs</artifactId>
-      <version>${appengine.version}</version>
+      <version>${appengine.target.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.google.appengine</groupId>
       <artifactId>appengine-tools-sdk</artifactId>
-      <version>${appengine.version}</version>
+      <version>${appengine.target.version}</version>
       <scope>test</scope>
     </dependency>
 

@@ -155,13 +155,13 @@ public class LibreriappApi
     }
 	
 	@ApiMethod(name = "editBook", path = "editBook", httpMethod = HttpMethod.POST)
-	public void editBook(@Named("email") String email, @Named("bookId") Long bookId, BookForm bookForm) throws Exception {		
+	public void editBook(@Named("email") String email, @Named("bookId") String bookId, BookForm bookForm) throws Exception {		
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
 		
 		BookDAO bookDao = new BookDAO();
-		Book boo = bookDao.load(bookId);
+		Book boo = bookDao.load(Long.parseLong(bookId));
 		
 		if(person==null || boo == null) {
 			System.err.println("El usuario o el libro no existe en el base de datos");
@@ -195,13 +195,13 @@ public class LibreriappApi
 	 * @throws Exception 
 	 */
 	@ApiMethod(name = "deleteBook", path = "deleteBook", httpMethod = HttpMethod.POST)
-	public void deleteBook(@Named("email") String email, @Named("bookid") Long bookId) throws Exception {		
+	public void deleteBook(@Named("email") String email, @Named("bookid") String bookId) throws Exception {		
 		
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
 		
 		Person person = daop.load(email);
-		Book book = daob.load(bookId);
+		Book book = daob.load(Long.parseLong(bookId));
 		
 		if(person == null || book == null) {
 			System.err.println("El usuario o el libro no existe en base de datos");
@@ -240,14 +240,58 @@ public class LibreriappApi
 		return myOwnBooks;
 	}
 	
+	@ApiMethod(name = "showUserRequestPurchase", path = "showUserRequestPurchase", httpMethod = HttpMethod.POST)
+	public List<Book> showUserRequestPurchase(@Named("email") String email) throws Exception {		
+		
+		PersonDAO dao = new PersonDAO();
+		Person person = dao.load(email);
+		
+		if(person==null) {
+			System.err.println("El usuario no existe en el base de datos");
+			throw new Exception("User does not exist in database");
+		}
+		
+		List<Ref<Book>> myRefBooks = person.getMyBooks();
+		List<Book> myRequestPurchaseBooks = new ArrayList<>();
+		
+		for (Ref<Book> obj : myRefBooks) {
+			if(obj.get().isConfirmPurchaser() && obj.get().isForSale() && !obj.get().isAvailable())
+				myRequestPurchaseBooks.add(obj.get());
+		}
+		
+		return myRequestPurchaseBooks;
+	}
+	
+	@ApiMethod(name = "showUserRequestExchange", path = "showUserRequestExchange", httpMethod = HttpMethod.POST)
+	public List<Book> showUserRequestExchange(@Named("email") String email) throws Exception {		
+		
+		PersonDAO dao = new PersonDAO();
+		Person person = dao.load(email);
+		
+		if(person==null) {
+			System.err.println("El usuario no existe en el base de datos");
+			throw new Exception("User does not exist in database");
+		}
+		
+		List<Ref<Book>> myRefBooks = person.getMyBooks();
+		List<Book> myRequestExchangeBooks = new ArrayList<>();
+		
+		for (Ref<Book> obj : myRefBooks) {
+			if(obj.get().isConfirmPurchaser() && obj.get().isExchange() && !obj.get().isAvailable())
+				myRequestExchangeBooks.add(obj.get());
+		}
+		
+		return myRequestExchangeBooks;
+	}
+	
 	@ApiMethod(name = "purchase", path = "purchase", httpMethod = HttpMethod.POST)
-	public ContactForm purchase(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") Long bookId) throws Exception {		
+	public ContactForm purchase(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") String bookId) throws Exception {		
 		//TODO Retorna una clase diferente que no persista con los datos de usuario
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
 		
 		Person person = daop.load(emailPurchaser);
-		Book book = daob.load(bookId);
+		Book book = daob.load(Long.parseLong(bookId));
 		
 		if(person == null || book == null) {
 			System.err.println("El usuario o el libro no existe en base de datos");
@@ -270,7 +314,7 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "confirmPurchase", path = "confirmPurchase", httpMethod = HttpMethod.POST)
-	public void confirmPurchase(@Named("emailVendor") String emailVendor, @Named("bookid") Long bookId, Transaction transaction) throws Exception {		
+	public void confirmPurchase(@Named("emailVendor") String emailVendor, @Named("bookid") String bookId, Transaction transaction) throws Exception {		
 		
 		//El Id del libro debe tener un confirm en true que indica que alguien lo desea
 		
@@ -278,7 +322,7 @@ public class LibreriappApi
 		Person vendor = daop.load(emailVendor);
 		
 		BookDAO daob = new BookDAO();
-		Book book = daob.load(bookId);
+		Book book = daob.load(Long.parseLong(bookId));
 		
 		if(book == null) {
 			System.err.println("El libro no existe en base de datos");
@@ -335,14 +379,14 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "exchange", path = "exchange", httpMethod = HttpMethod.POST)
-	public ContactForm exchange(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") Long bookId, @Named("myoffer") Long myOfferBookId) throws Exception {		
+	public ContactForm exchange(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") String bookId, @Named("myoffer") String myOfferBookId) throws Exception {		
 		//TODO Retorna una clase diferente que no persista con los datos de usuario
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
 		
 		Person person = daop.load(emailPurchaser);
-		Book bookWanted = daob.load(bookId);
-		Book myBookOffer = daob.load(myOfferBookId);
+		Book bookWanted = daob.load(Long.parseLong(bookId));
+		Book myBookOffer = daob.load(Long.parseLong(myOfferBookId));
 		
 		
 		if(person == null || bookWanted == null || myBookOffer == null) {
@@ -365,7 +409,7 @@ public class LibreriappApi
 		bookWanted.setConfirmPurchaser(true);	
 		bookWanted.setAvailable(false);
 		bookWanted.setEmailPurchaser(emailPurchaser);
-		bookWanted.setOfferedBook(myOfferBookId);
+		bookWanted.setOfferedBook(Long.parseLong(myOfferBookId));
 		
 		daob.save(bookWanted);
 		
@@ -374,7 +418,7 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "confirmExchange", path = "confirmExchange", httpMethod = HttpMethod.POST)
-	public void confirmExchange(@Named("emailVendor") String emailVendor, @Named("bookid") Long bookId, Transaction transaction) throws Exception {		
+	public void confirmExchange(@Named("emailVendor") String emailVendor, @Named("bookid") String bookId, Transaction transaction) throws Exception {		
 		
 		//El Id del libro debe tener un confirm en true que indica que alguien lo desea
 		
@@ -382,7 +426,7 @@ public class LibreriappApi
 		Person vendor = daop.load(emailVendor);
 	
 		BookDAO daob = new BookDAO();
-		Book book = daob.load(bookId);
+		Book book = daob.load(Long.parseLong(bookId));
 		
 		if(book == null || vendor==null) {
 			System.err.println("El libro o usuario no existe en base de datos");
