@@ -108,73 +108,60 @@ angular.module('BookStoreApp.controllers', [])
         $scope.init = function () {
             $scope.loading = true;
             gapi.client.libreriapp.listBooks().execute(function(resp) {
-                    if (!resp.code) {
-                            resp.items = resp.items || [];
-                            
-                            $scope.thebooks = [];
-                            $scope.justtest = resp.items;
-                            angular.forEach(resp.items, function(book) {
-                            	$scope.thebooks.push(book);
-                            });
-                            Loader.hideLoading();
-                    }
+            	$scope.$apply(function () {
+            		if (!resp.code) {
+                        resp.items = resp.items || [];
+                        
+                        $scope.thebooks = [];
+                        $scope.justtest = resp.items;
+                        angular.forEach(resp.items, function(book) {
+                        	$scope.thebooks.push(book);
+                        });
+                        Loader.hideLoading();
+                        $scope.$apply();
+            		}
+            	});                   
             });
         };
         
     })
     
-.controller('singleBookCtrl', ['$scope', '$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
+.controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
 	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader) {
 
-		var bookId = $state.params.bookId;
-		//$scope.book = LSFactory.get(bookId);
+		var myVar = $state.params.bookId;
 		
-		console.log("BookId");
-		console.log(BookId);
+		$scope.bookId = {
+				"bookId": myVar
+		};
 		
 		$scope.listOneBook = function () {
             $scope.submitted = true;
             $scope.loading = true;
             
-            gapi.client.libreriapp.listOneBook(bookId).execute(function(resp) {
+            $scope.tmp = myVar;
+            
+            gapi.client.libreriapp.listOneBook($scope.bookId).execute(function(resp) {
                     if (!resp.code) {
-                            $scope.book = resp.item;
+                            $scope.book = resp.result;
+                            $scope.$apply();
+                    }else {
+                    	var errorMessage = resp.error.message || '';
+                        $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+                        $scope.alertStatus = 'warning';
+                        $log.error($scope.messages);
                     }
             });
         };
 
-		$scope.$on('addToCart', function() {
-			Loader.showLoading('Adding to Cart..');
-			UserFactory.addToCart({
-				id: bookId,
-				qty: 1
-			}).success(function(data) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage('Successfully added ' + $scope.book.title + ' to your cart', 2000);
-			}).error(function(err, statusCode) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage(err.message);
-			});
-		});
-
-		$scope.addToCart = function() {
-			if (!AuthFactory.isLoggedIn()) {
-				$rootScope.$broadcast('showLoginModal', $scope, null, function() {
-					// user is now logged in
-					$scope.$broadcast('addToCart');
-				});
-				return;
-			}
-			$scope.$broadcast('addToCart');
-		}
 	}
 ])    
 
 .controller('BookCtrl', ['$scope', '$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
 	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader) {
 
-		//var bookId = $state.params.bookId;
-		//$scope.book = LSFactory.get(bookId);
+		var bookId = $state.params.bookId;
+		$scope.book = LSFactory.get(bookId);
 		
 		$scope.listOneBook = function () {
             $scope.submitted = true;

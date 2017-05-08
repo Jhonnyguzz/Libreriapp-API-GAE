@@ -1,2 +1,4 @@
-co/edu/unal/libreriapp/form/PersonForm.class
-co/edu/unal/libreriapp/util/Constants.class
+co\edu\unal\libreriapp\model\Transaction.class
+co\edu\unal\libreriapp\form\PersonForm.class
+co\edu\unal\libreriapp\util\Constants.class
+co\edu\unal\libreriapp\model\ContactForm.class

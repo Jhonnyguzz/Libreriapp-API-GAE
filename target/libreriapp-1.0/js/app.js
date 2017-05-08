@@ -59,7 +59,7 @@ angular.module('BookStoreApp', ['ionic', 'BookStoreApp.controllers', 'BookStoreA
             views: {
                 'menuContent': {
                     templateUrl: "templates/book.html",
-                    controller: 'BookCtrl'
+                    controller: 'singleBookCtrl'
                 }
             }
         })
