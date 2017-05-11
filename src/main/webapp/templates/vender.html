@@ -1,0 +1,38 @@
+<ion-view view-title="Vende un libro" hide-back-button="false">
+	<ion-content>
+			
+		<ion-header-bar>
+			<h1 class="title">Vender un libro</h1>
+		</ion-header-bar>
+		<ion-content>
+			<form>
+			<div class="list">
+				<label class="item item-input">
+					<span class="input-label">Nombre</span>
+					<input type="text" placeholder="Nombre" ng-model="book.name">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Autor</span>
+					<input type="text" placeholder="Autor" ng-model="book.author">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Descripcion</span>
+					<input type="text" placeholder="Descripcion" ng-model="book.description">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Precio</span>
+					<input type="number" placeholder="Precio" ng-model="book.price">
+				</label>
+				<ion-list>
+				  <ion-checkbox ng-model="book.exchange">Intercambio</ion-checkbox>
+				  <ion-checkbox ng-model="book.isForSale">Venta</ion-checkbox>
+				</ion-list>
+				<label class="item">
+					<button class="button button-block button-assertive" ng-click="login()" ng-disabled="!book.name || !book.author || !book.description || !book.price || (!book.isForSale || !book.exchange)" type="submit">Vender</button>
+				</label>
+			</div>
+			</form>
+		</ion-content>
+		
+	</ion-content>
+</ion-view>

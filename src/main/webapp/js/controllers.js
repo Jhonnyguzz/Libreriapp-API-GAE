@@ -123,7 +123,7 @@ angular.module('BookStoreApp.controllers', [])
             	});                   
             });
         };
-        
+        init();
     })
     
 .controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
@@ -153,6 +153,14 @@ angular.module('BookStoreApp.controllers', [])
                     }
             });
         };
+
+	}
+])    
+
+.controller('venderCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
+	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader) {
+
+		//Vender
 
 	}
 ])    
