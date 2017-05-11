@@ -123,7 +123,9 @@ angular.module('BookStoreApp.controllers', [])
             	});                   
             });
         };
-        init();
+        
+        //Call for my method
+        //init();
     })
     
 .controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',

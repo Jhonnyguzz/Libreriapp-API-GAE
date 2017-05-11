@@ -1,7 +1,15 @@
 <ion-view view-title="Todos los libros" hide-back-button="true">
 	<ion-content>
 		<ion-list>
-		<p ng-click="init()">Haz clic por aca para cargar</p>
+		<p ng-click="init()">Haz clic aqui para cargar libros</p>
+		<form>
+			<div class="list">
+				<label class="item item-input">
+		  		<i class="icon ion-search placeholder-icon"></i>
+		  		<input type="search" placeholder="Buscar" ng-model="regexp">
+				</label>
+			</div>
+		</form>
 			<div ng-repeat="book in thebooks track by $index" class="row responsive-sm" ng-if="$index % 2 == 0">
 				<!-- el tag de abajo es el que al darle click redirecciona a mas informacion del libro -->
 				<ion-item class="col-50" ng-repeat="i in [$index, $index + 1]" ng-if="thebooks[i] != null" ng-href="#/app/book/{{::thebooks[i].id}}">
