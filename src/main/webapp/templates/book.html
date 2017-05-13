@@ -31,11 +31,11 @@
 					</label>
 				</p>
 				
-				<button class="button button-assertive button-block" ng-click="addToCart()">
+				<button class="button button-assertive button-block" ng-hide="!isAuthenticated" ng-click="addToCart()">
 					Intercambiar
 				</button>
 				
-				<button class="button button-assertive button-block" ng-click="addToCart()">
+				<button class="button button-assertive button-block" ng-hide="!isAuthenticated" ng-click="addToCart()">
 					Comprar
 				</button>
 			</div>
