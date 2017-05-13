@@ -41,10 +41,10 @@
             */
             
             gapi.client.load('libreriapp', 'v1', null, '//' + window.location.host + '/_ah/api');
-            /* gapi.client.load('oauth2', 'v2', function () {
+            gapi.client.load('oauth2', 'v2', function () {
                 angular.bootstrap(document, ['BookStoreApp']);
-            }); */   
-            gapi.client.load('oauth2', 'v2', null);
+            });   
+            //gapi.client.load('oauth2', 'v2', null);
         };
     </script>
 	

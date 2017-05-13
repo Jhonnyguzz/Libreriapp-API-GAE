@@ -18,7 +18,10 @@ angular.module('BookStoreApp', ['ionic', 'BookStoreApp.controllers', 'BookStoreA
             StatusBar.styleDefault();
         }
     });
-}).run(['$rootScope', 'AuthFactory',
+})
+
+
+.run(['$rootScope', 'AuthFactory',
     function($rootScope, AuthFactory) {
 
         $rootScope.isAuthenticated = AuthFactory.isLoggedIn();
@@ -29,7 +32,10 @@ angular.module('BookStoreApp', ['ionic', 'BookStoreApp.controllers', 'BookStoreA
         }
 
     }
-]).config(['$stateProvider', '$urlRouterProvider', '$httpProvider',
+])
+
+
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider',
     function($stateProvider, $urlRouterProvider, $httpProvider) {
 
         // setup the token interceptor

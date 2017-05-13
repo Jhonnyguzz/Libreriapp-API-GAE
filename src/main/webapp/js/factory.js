@@ -111,7 +111,7 @@ angular.module('BookStoreApp.factory', [])
      */
     oauth2Provider.showLoginModal = function() {
         var modalInstance = $modal.open({
-            templateUrl: '/templates/login.html',
+            templateUrl: '/templates/loginmsg.html',
             controller: 'OAuth2LoginModalCtrl'
         });
         return modalInstance;

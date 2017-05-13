@@ -1,0 +1,31 @@
+<ion-modal-view>
+	<div class="tabs-striped tabs-background-assertive tabs-color-light">
+		<div class="tabs">
+		<!-- 
+			<a class="tab-item" ng-class="{active : viewLogin}" href="javascript:" ng-click="switchTab('login')">
+				
+			</a>
+		-->
+		</div>
+	</div>
+
+	<!-- login pane -->
+	<ion-pane ng-show="viewLogin">
+		<ion-header-bar>
+			<h1 class="title">Para continuar porfavor iniciar sesion con Google.</h1>
+			<div class="buttons">
+				<button class="button button-assertive" ng-click="hide()">Close</button>
+			</div>
+		</ion-header-bar>
+		<ion-content>
+			
+		<!-- Solo el boton -->
+			<button class="button button-assertive button-block" ng-click="singIn()">Google+ SignIn</button>
+			{{test}}
+			{{segundomensaje}}
+		</ion-content>
+	</ion-pane>
+
+
+	
+</ion-modal-view>
