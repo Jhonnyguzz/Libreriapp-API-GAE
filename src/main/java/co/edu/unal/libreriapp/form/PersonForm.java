@@ -4,12 +4,14 @@ public class PersonForm
 {
 	private String name;
 	private String email;
+	private String urlPicture;
 	
 	public PersonForm() {}
 	
-	public PersonForm(String name, String email) {
+	public PersonForm(String name, String email, String urlPicture) {
 		this.setName(name);
 		this.setEmail(email);
+		this.setUrlPicture(urlPicture);
 	}
 
 	public String getName() {
@@ -26,6 +28,14 @@ public class PersonForm
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getUrlPicture() {
+		return urlPicture;
+	}
+
+	public void setUrlPicture(String urlPicture) {
+		this.urlPicture = urlPicture;
 	}
 		
 }

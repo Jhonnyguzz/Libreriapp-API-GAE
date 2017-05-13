@@ -36,6 +36,7 @@ public class LibreriappApi
         	p = new Person();
         	p.setEmail(mainEmail);
         	p.setName(person.getName());
+        	p.setUrlPicture(person.getUrlPicture());
         	personDao.save(p);
         }else {
         	System.err.println("El usuario ya existe");

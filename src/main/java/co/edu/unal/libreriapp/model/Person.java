@@ -26,7 +26,7 @@ public class Person implements Serializable
 	private String gender;
 	private Date birthday;
 	private byte[] picture;
-	private String urlPricture;
+	private String urlPicture;
 	private double reputation;
 	private int points;
 	@ApiResourceProperty(ignored = AnnotationBoolean.TRUE) 
@@ -46,7 +46,7 @@ public class Person implements Serializable
 	}
 	
 	public Person(String email, String password, String name, String lastName, String gender, Date birthday,
-			byte[] picture, String urlPricture, double reputation, int points, List<Ref<Book>> myBooks) {
+			byte[] picture, String urlPicture, double reputation, int points, List<Ref<Book>> myBooks) {
 		super();
 		this.email = email;
 		this.password = password;
@@ -55,7 +55,7 @@ public class Person implements Serializable
 		this.gender = gender;
 		this.birthday = birthday;
 		this.picture = picture;
-		this.urlPricture = urlPricture;
+		this.urlPicture = urlPicture;
 		this.reputation = reputation;
 		this.points = points;
 		this.myBooks = myBooks;
@@ -150,12 +150,12 @@ public class Person implements Serializable
 		this.picture = picture;
 	}
 	
-	public String getUrlPricture() {
-		return urlPricture;
+	public String getUrlPicture() {
+		return urlPicture;
 	}
 
-	public void setUrlPricture(String urlPricture) {
-		this.urlPricture = urlPricture;
+	public void setUrlPicture(String urlPicture) {
+		this.urlPicture = urlPicture;
 	}
 
 	public double getReputation() {

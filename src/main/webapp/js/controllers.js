@@ -8,7 +8,7 @@ angular.module('BookStoreApp.controllers', [])
 		$rootScope.$on('showLoginModal', function($event, scope, cancelCallback, callback) {
 			$scope.user = {
 				name: '',
-			  email: '',
+				email: '',
 				password: ''
 			};
 
@@ -35,50 +35,56 @@ angular.module('BookStoreApp.controllers', [])
 						cancelCallback();
 					}
 				};
+				
+				//Mi OAuth2 Empieza acá
+				/**
+			     * Returns if the viewLocation is the currently viewed page.
+			     *
+			     * @param viewLocation
+			     * @returns {boolean} true if viewLocation is the currently viewed page. Returns false otherwise.
+			     */
+			    $scope.isActive = function (viewLocation) {
+			        return viewLocation === $location.path();
+			    };
 
-				$scope.login = function() {
-					Loader.showLoading('Authenticating...');
-
-					UserFactory.login($scope.user).success(function(data) {
-
-						data = data.data;
-						AuthFactory.setUser(data.user);
-						AuthFactory.setToken({
-							token: data.token,
-							expires: data.expires
-						});
-
-						$rootScope.isAuthenticated = true;
-						$scope.modal.hide();
-						Loader.hideLoading();
-						if (typeof callback === 'function')
-							callback();
-
-					}).error(function(err, statusCode) {
-						Loader.hideLoading();
-						Loader.toggleLoadingWithMessage(err.message);
-					});
-				};
+			    /**
+			     * Returns the OAuth2 signedIn state.
+			     *
+			     * @returns {oauth2Provider.signedIn|*} true if siendIn, false otherwise.
+			     */
+			    $scope.getSignedInState = function () {
+			        return oauth2Provider.signedIn;
+			    };
 
 				/**
 				 * Controlador del boton de darle login
 				 */
 				//Button signIn				
 				 $scope.singIn = function () {
-					 $scope.test = 'Si estoy entrando pero seguro falta configurar el provider o algo mas :v';
+					 //$scope.test = 'Si estoy entrando pero seguro falta configurar el provider o algo mas :v';
 			            oauth2Provider.signIn(function () {
 			                gapi.client.oauth2.userinfo.get().execute(function (resp) {
 			                    $scope.$apply(function () {
 			                    	if (!resp.code) {
 			                    		oauth2Provider.signedIn = true;
+			                    		$scope.isAuthenticated = oauth2Provider.signedIn;
 				                        $scope.alertStatus = 'success';
 				                        $scope.rootMessages = 'Logged in with ' + resp.email;
-				                        $scope.segundomensaje = "Exito!"
+				                        $scope.segundomensaje = "Exito por show login modal!"
+				                        	
+				                        //Hacer mi logica de negocio
+				                        //salvar
+				                        
+				                        	
+				                        	
+				                        //Cerrar el login
+				                        $scope.modal.hide();
 			                		}else {
-			                			oauth2Provider.signedIn = true;
+			                			oauth2Provider.signedIn = false;
+			                			$scope.isAuthenticated = oauth2Provider.signedIn;
 			                			$scope.alertStatus = 'Algo fallo';
 			                			$scope.rootMessages = 'Logged in with ' + resp.email;
-			                			$scope.segundomensaje = "Algo Falla!";
+			                			$scope.segundomensaje = "Algo Falla por show login modal!";
 			                		}
 			                    });
 			                });
@@ -88,107 +94,50 @@ angular.module('BookStoreApp.controllers', [])
 			});
 		});
 
+		//Cuando se da clic directamente en el menu y no se dispara por acción faltante
 		$rootScope.loginFromMenu = function() {
 			$rootScope.$broadcast('showLoginModal', $scope, null, null);
 		};
 
-		$rootScope.logout = function() {
-			UserFactory.logout();
-			$rootScope.isAuthenticated = false;
-			$location.path('/app/browse');
-			Loader.toggleLoadingWithMessage('Successfully Logged Out!', 2000);
-		}
+		$scope.signOut = function () {
+	        oauth2Provider.signOut();
+	        $scope.isAuthenticated = oauth2Provider.signedIn;
+	        $scope.alertStatus = 'success';
+	        $scope.rootMessages = 'Logged out';
+	        Loader.toggleLoadingWithMessage('Saliste!', 2000);
+	    };
+	    
 	}
 ])
 
 
-.controller('RootCtrl', function ($scope, $location, oauth2Provider) {
-
-    /**
-     * Returns if the viewLocation is the currently viewed page.
-     *
-     * @param viewLocation
-     * @returns {boolean} true if viewLocation is the currently viewed page. Returns false otherwise.
-     */
-    $scope.isActive = function (viewLocation) {
-        return viewLocation === $location.path();
-    };
-
-    /**
-     * Returns the OAuth2 signedIn state.
-     *
-     * @returns {oauth2Provider.signedIn|*} true if siendIn, false otherwise.
-     */
-    $scope.getSignedInState = function () {
-        return oauth2Provider.signedIn;
-    };
-
-    /**
-     * Calls the OAuth2 authentication method.
-     */
-    $scope.signIn = function () {
-        oauth2Provider.signIn(function () {
-            gapi.client.oauth2.userinfo.get().execute(function (resp) {
-                $scope.$apply(function () {
-                    if (resp.email) {
-                        oauth2Provider.signedIn = true;
-                        $scope.alertStatus = 'success';
-                        $scope.rootMessages = 'Logged in with ' + resp.email;
-                    }
-                });
-            });
-        });
-    };
-
-    /**
-     * Render the signInButton and restore the credential if it's stored in the cookie.
-     * (Just calling this to restore the credential from the stored cookie. So hiding the signInButton immediately
-     *  after the rendering)
-     */
-    $scope.initSignInButton = function () {
-        gapi.signin.render('signInButton', {
-            'callback': function () {
-                jQuery('#signInButton button').attr('disabled', 'true').css('cursor', 'default');
-                if (gapi.auth.getToken() && gapi.auth.getToken().access_token) {
-                    $scope.$apply(function () {
-                        oauth2Provider.signedIn = true;
-                    });
-                }
-            },
-            'clientid': oauth2Provider.CLIENT_ID,
-            'cookiepolicy': 'single_host_origin',
-            'scope': oauth2Provider.SCOPES
-        });
-    };
-
-    /**
-     * Logs out the user.
-     */
-    $scope.signOut = function () {
-        oauth2Provider.signOut();
-        $scope.alertStatus = 'success';
-        $scope.rootMessages = 'Logged out';
-    };
-
-    /**
-     * Collapses the navbar on mobile devices.
-     */
-    $scope.collapseNavbar = function () {
-        angular.element(document.querySelector('.navbar-collapse')).removeClass('in');
-    };
-
-})
-
-/*
 .controller('OAuth2LoginModalCtrl',
     function ($scope, $modalInstance, $rootScope, oauth2Provider) {
         $scope.singInViaModal = function () {
             oauth2Provider.signIn(function () {
                 gapi.client.oauth2.userinfo.get().execute(function (resp) {
                     $scope.$root.$apply(function () {
-                        oauth2Provider.signedIn = true;
-                        $scope.$root.alertStatus = 'success';
-                        $scope.$root.rootMessages = 'Logged in with ' + resp.email;
+                    	if (!resp.code) {
+                    		oauth2Provider.signedIn = true;
+                    		$scope.$root.isAuthenticated = oauth2Provider.signedIn;
+	                        $scope.$root.alertStatus = 'success';
+	                        $scope.$root.rootMessages = 'Logged in with ' + resp.email;
+	                        $scope.$root.segundomensaje = "Exito por controlador!"
+	                        	
+	                        //Hacer mi logica de negocio
+	                        //salvar
+	                        
+	                        	
+	                        	
+	                        //Cerrar el login
+	                        $scope.modal.hide();
+                		}else {
+                			oauth2Provider.signedIn = false;
+                			$scope.$root.isAuthenticated = oauth2Provider.signedIn;
+                			$scope.$root.alertStatus = 'Algo fallo';
+                			$scope.$root.rootMessages = 'Logged in with ' + resp.email;
+                			$scope.$root.segundomensaje = "Algo Falla por controlador!";
+                		}
                     });
 
                     $modalInstance.close();
@@ -196,7 +145,7 @@ angular.module('BookStoreApp.controllers', [])
             });
         };
     })
-*/
+
 
 .controller('listBooksCtrl',
     function ($scope, $log, Loader) {
@@ -231,8 +180,8 @@ angular.module('BookStoreApp.controllers', [])
         //showAllBooks();
     })
     
-.controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
-	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader) {
+.controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
 
 		var myVar = $state.params.bookId;
 		
@@ -262,16 +211,16 @@ angular.module('BookStoreApp.controllers', [])
 	}
 ])    
 
-.controller('venderCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
-	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader) {
+.controller('venderCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
 
 		//Vender
 
 	}
 ])    
 
-.controller('BookCtrl', ['$scope', '$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
-	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader) {
+.controller('BookCtrl', ['$scope', '$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
 
 		var bookId = $state.params.bookId;
 		$scope.book = LSFactory.get(bookId);
@@ -305,7 +254,7 @@ angular.module('BookStoreApp.controllers', [])
 		});
 
 		$scope.addToCart = function() {
-			if (!AuthFactory.isLoggedIn()) {
+			if (!oauth2Provider.signedIn) {
 				$rootScope.$broadcast('showLoginModal', $scope, null, function() {
 					// user is now logged in
 					$scope.$broadcast('addToCart');
@@ -317,8 +266,8 @@ angular.module('BookStoreApp.controllers', [])
 	}
 ])
 
-.controller('CartCtrl', ['$scope', 'AuthFactory', '$rootScope', '$location', '$timeout', 'UserFactory', 'Loader',
-	function($scope, AuthFactory, $rootScope, $location, $timeout, UserFactory, Loader) {
+.controller('CartCtrl', ['$scope', 'AuthFactory', '$rootScope', '$location', '$timeout', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, AuthFactory, $rootScope, $location, $timeout, UserFactory, Loader, oauth2Provider) {
 
 		$scope.$on('getCart', function() {
 			Loader.showLoading('Fetching Your Cart..');
@@ -331,7 +280,7 @@ angular.module('BookStoreApp.controllers', [])
 			});
 		});
 
-		if (!AuthFactory.isLoggedIn()) {
+		if (!oauth2Provider.signedIn) {
 			$rootScope.$broadcast('showLoginModal', $scope, function() {
 				// cancel auth callback
 				$timeout(function() {
@@ -370,8 +319,8 @@ angular.module('BookStoreApp.controllers', [])
 	}
 ])
 
-.controller('PurchasesCtrl', ['$scope', '$rootScope', 'AuthFactory', 'UserFactory', '$timeout', 'Loader',
-	function($scope, $rootScope, AuthFactory, UserFactory, $timeout, Loader) {
+.controller('PurchasesCtrl', ['$scope', '$rootScope', 'AuthFactory', 'UserFactory', '$timeout', 'Loader', 'oauth2Provider',
+	function($scope, $rootScope, AuthFactory, UserFactory, $timeout, Loader, oauth2Provider) {
 		// http://forum.ionicframework.com/t/expandable-list-in-ionic/3297/2
 		$scope.groups = [];
 
@@ -411,7 +360,7 @@ angular.module('BookStoreApp.controllers', [])
 			});
 		});
 
-		if (!AuthFactory.isLoggedIn()) {
+		if (!oauth2Provider.signedIn) {
 			$rootScope.$broadcast('showLoginModal', $scope, function() {
 				// cancel auth callback
 				$timeout(function() {
