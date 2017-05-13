@@ -19,16 +19,25 @@
 		<ion-content>
 			<ion-list>
 				<ion-item menu-close href="#/app/browse">
-					Browse Books
-				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/cart">
-					My Cart
-				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/purchases">
-					My Purchases
+					Libros disponibles
 				</ion-item>
 				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/vender">
-					Vender un libro
+					Vender
+				</ion-item>
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/vender">
+					Tus compras
+				</ion-item>
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/vender">
+					Tus intercambios
+				</ion-item>
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/cart">
+					Ventas pendientes
+				</ion-item>
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/purchases">
+					Intercambios pendientes
+				</ion-item>
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/vender">
+					Perfil
 				</ion-item>
 				<ion-item menu-close ng-show="isAuthenticated" ng-click="signOut()">
 					Logout

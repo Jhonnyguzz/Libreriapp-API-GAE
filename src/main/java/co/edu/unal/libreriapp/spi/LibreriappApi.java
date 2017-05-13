@@ -39,8 +39,7 @@ public class LibreriappApi
         	p.setUrlPicture(person.getUrlPicture());
         	personDao.save(p);
         }else {
-        	System.err.println("El usuario ya existe");
-        	throw new Exception("El usuario ya existe");
+        	System.err.println("El usuario ya existe, no se sobreescribe");
         }
         return p;
     }

@@ -6,6 +6,7 @@ angular.module('BookStoreApp.controllers', [])
 	function($rootScope, $ionicModal, AuthFactory, $location, UserFactory, $scope, Loader, oauth2Provider) {
 
 		$rootScope.$on('showLoginModal', function($event, scope, cancelCallback, callback) {
+			
 			$scope.user = {
 				name: '',
 				email: '',
@@ -55,7 +56,28 @@ angular.module('BookStoreApp.controllers', [])
 			    $scope.getSignedInState = function () {
 			        return oauth2Provider.signedIn;
 			    };
+			    
+			    
+			    $scope.saveAPerson = function(dataPerson) {
+			    	gapi.client.libreriapp.savePerson(dataPerson).execute(function(resp) {
+		            	$scope.$apply(function () {
+		            		if (!resp.code) {
 
+		            			//El API retorna aca el usuario pero no lo necesito
+		            			//por el momento
+		            			$scope.falla = "hola men :v";
+		            		}
+		            		else {
+		                    	var errorMessage = resp.error.message || '';
+		                        $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+		                        $scope.alertStatus = 'warning';
+		                        $scope.falla = "Hay una falla salvando";
+		                        $log.error($scope.messages);
+		                    }
+		            	});                   
+		            });
+			    };
+			    
 				/**
 				 * Controlador del boton de darle login
 				 */
@@ -70,13 +92,26 @@ angular.module('BookStoreApp.controllers', [])
 			                    		$scope.isAuthenticated = oauth2Provider.signedIn;
 				                        $scope.alertStatus = 'success';
 				                        $scope.rootMessages = 'Logged in with ' + resp.email;
-				                        $scope.segundomensaje = "Exito por show login modal!"
+				                        $scope.segundomensaje = "Identificacion exitosa!"
 				                        	
 				                        //Hacer mi logica de negocio
 				                        //salvar
+				                        	
+			                        	$scope.person = {
+			                				"name": resp.name,
+			                				"email": resp.email,
+			                				"urlPicture": resp.picture
+			                			};
 				                        
+				                        Loader.showLoading();
+				                        saveAPerson($scope.person);
+				                        
+				                        $scope.$root.email = resp.email; 
+				                        $scope.$root.name = resp.name;
 				                        	
-				                        	
+				                        //Ocultar el toggle
+				                        Loader.hideLoading();
+				                        
 				                        //Cerrar el login
 				                        $scope.modal.hide();
 			                		}else {
@@ -84,7 +119,7 @@ angular.module('BookStoreApp.controllers', [])
 			                			$scope.isAuthenticated = oauth2Provider.signedIn;
 			                			$scope.alertStatus = 'Algo fallo';
 			                			$scope.rootMessages = 'Logged in with ' + resp.email;
-			                			$scope.segundomensaje = "Algo Falla por show login modal!";
+			                			$scope.segundomensaje = "Aun no te encuentras autenticado!";
 			                		}
 			                    });
 			                });
@@ -155,13 +190,13 @@ angular.module('BookStoreApp.controllers', [])
         //Loader.showLoading();
         
         $scope.showAllBooks = function () {
+        	Loader.showLoading();
             $scope.loading = true;
             gapi.client.libreriapp.listBooks().execute(function(resp) {
             	$scope.$apply(function () {
             		if (!resp.code) {
                         resp.items = resp.items || [];
                         
-                        Loader.showLoading();
                         
                         $scope.thebooks = [];
                         $scope.justtest = resp.items;
@@ -186,7 +221,7 @@ angular.module('BookStoreApp.controllers', [])
 		var myVar = $state.params.bookId;
 		
 		$scope.bookId = {
-				"bookId": myVar
+			"bookId": myVar
 		};
 		
 		$scope.listOneBook = function () {
