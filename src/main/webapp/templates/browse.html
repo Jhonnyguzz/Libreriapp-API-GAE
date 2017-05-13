@@ -1,7 +1,14 @@
+<ion-nav-bar class="bar-assertive">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="showAllBooks()"></a>
+	</ion-nav-buttons>
+</ion-nav-bar>
 <ion-view view-title="Todos los libros" hide-back-button="true">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="showAllBooks()"></a>
+	</ion-nav-buttons>
 	<ion-content>
 		<ion-list>
-		<p ng-click="init()">Haz clic aqui para cargar libros</p>
 		<form>
 			<div class="list">
 				<label class="item item-input">

@@ -1,10 +1,18 @@
+<ion-nav-bar class="bar-assertive">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="listOneBook()"></a>
+	</ion-nav-buttons>
+</ion-nav-bar>
+
 <ion-view view-title="{{book.name}}" hide-back-button="true">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="listOneBook()"></a>
+	</ion-nav-buttons>
 	<ion-content>
 		<div class="list card">
-			<div class="item item-avatar">
-				<p ng-click="listOneBook()">Haz clic por aca para cargar</p>
-				<h2>{{tmp}}</h2>
-				<img ng-src="#">
+			<div class="item item-avatar">			
+				<!-- <h2>{{tmp}}</h2> 
+				<img ng-src="#"> -->
 				<h2>{{::book.name}}</h2>
 				<p>{{::book.author}}</p>
 			</div>
@@ -24,11 +32,11 @@
 				</p>
 				
 				<button class="button button-assertive button-block" ng-click="addToCart()">
-					<i class="icon ion-checkmark"></i> Intercambiar
+					Intercambiar
 				</button>
 				
 				<button class="button button-assertive button-block" ng-click="addToCart()">
-					<i class="icon ion-checkmark"></i> Comprar
+					Comprar
 				</button>
 			</div>
 		</div>

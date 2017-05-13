@@ -105,27 +105,30 @@ angular.module('BookStoreApp.controllers', [])
  
         //Loader.showLoading();
         
-        $scope.init = function () {
+        $scope.showAllBooks = function () {
             $scope.loading = true;
             gapi.client.libreriapp.listBooks().execute(function(resp) {
             	$scope.$apply(function () {
             		if (!resp.code) {
                         resp.items = resp.items || [];
                         
+                        Loader.showLoading();
+                        
                         $scope.thebooks = [];
                         $scope.justtest = resp.items;
                         angular.forEach(resp.items, function(book) {
                         	$scope.thebooks.push(book);
                         });
+                        
+                        //$scope.$apply();
                         Loader.hideLoading();
-                        $scope.$apply();
             		}
             	});                   
             });
         };
         
         //Call for my method
-        //init();
+        //showAllBooks();
     })
     
 .controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader',
