@@ -7,6 +7,7 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Ref;
 
 import co.edu.unal.libreriapp.dao.BookDAO;
@@ -15,6 +16,7 @@ import co.edu.unal.libreriapp.form.BookForm;
 import co.edu.unal.libreriapp.form.PersonForm;
 import co.edu.unal.libreriapp.model.Book;
 import co.edu.unal.libreriapp.model.ContactForm;
+import co.edu.unal.libreriapp.model.ExchangeTransaction;
 import co.edu.unal.libreriapp.model.Person;
 import co.edu.unal.libreriapp.model.Transaction;
 //import com.google.api.client.googleapis.auth.oauth2.;
@@ -26,10 +28,11 @@ public class LibreriappApi
 {
 	
 	@ApiMethod(name = "savePerson", path = "savePerson", httpMethod = HttpMethod.POST)
-	public Person savePerson(PersonForm person) throws Exception {
+	public Person savePerson(final User user, PersonForm person) throws Exception {
 
-        String mainEmail = person.getEmail();
-        
+        //String mainEmail = person.getEmail();
+		String mainEmail = user.getEmail();
+		
         PersonDAO personDao = new PersonDAO();
         Person p = personDao.load(mainEmail);
         if(p==null) {
@@ -45,10 +48,11 @@ public class LibreriappApi
     }
 	
 	@ApiMethod(name = "editPerson", path = "editPerson", httpMethod = HttpMethod.POST)
-	public Person editPerson(PersonForm person) throws Exception {
+	public Person editPerson(final User user, PersonForm person) throws Exception {
 
-        String mainEmail = person.getEmail();
-        
+        //String mainEmail = person.getEmail();
+		String mainEmail = user.getEmail();
+		
         PersonDAO personDao = new PersonDAO();
         Person p = personDao.load(mainEmail);
         
@@ -113,7 +117,9 @@ public class LibreriappApi
     }
 	
 	@ApiMethod(name = "saveBook", path = "saveBook", httpMethod = HttpMethod.POST)
-	public void saveBook(@Named("email") String email, BookForm bookForm) throws Exception {		
+	public void saveBook(final User user, BookForm bookForm) throws Exception {		
+		
+		String email = user.getEmail();
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
@@ -156,7 +162,7 @@ public class LibreriappApi
 	
 	@ApiMethod(name = "editBook", path = "editBook", httpMethod = HttpMethod.POST)
 	public void editBook(@Named("email") String email, @Named("bookId") String bookId, BookForm bookForm) throws Exception {		
-		
+		//TODO Arreglar los parametros de este api
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
 		
@@ -195,7 +201,9 @@ public class LibreriappApi
 	 * @throws Exception 
 	 */
 	@ApiMethod(name = "deleteBook", path = "deleteBook", httpMethod = HttpMethod.POST)
-	public void deleteBook(@Named("email") String email, @Named("bookid") String bookId) throws Exception {		
+	public void deleteBook(final User user, @Named("bookId") String bookId) throws Exception {		
+		String email = user.getEmail();
+		//@Named("email") String email
 		
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
@@ -220,7 +228,9 @@ public class LibreriappApi
     }
 	
 	@ApiMethod(name = "myBooks", path = "myBooks", httpMethod = HttpMethod.POST)
-	public List<Book> myBooks(@Named("email") String email) throws Exception {		
+	public List<Book> myBooks(final User user) throws Exception {		
+		
+		String email = user.getEmail();
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
@@ -241,7 +251,9 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "showUserRequestPurchase", path = "showUserRequestPurchase", httpMethod = HttpMethod.POST)
-	public List<Book> showUserRequestPurchase(@Named("email") String email) throws Exception {		
+	public List<Book> showUserRequestPurchase(final User user) throws Exception {		
+		
+		String email = user.getEmail();
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
@@ -263,7 +275,9 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "showUserRequestExchange", path = "showUserRequestExchange", httpMethod = HttpMethod.POST)
-	public List<Book> showUserRequestExchange(@Named("email") String email) throws Exception {		
+	public List<Book> showUserRequestExchange(final User user) throws Exception {		
+		
+		String email = user.getEmail();
 		
 		PersonDAO dao = new PersonDAO();
 		Person person = dao.load(email);
@@ -285,7 +299,10 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "purchase", path = "purchase", httpMethod = HttpMethod.POST)
-	public ContactForm purchase(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") String bookId) throws Exception {		
+	public ContactForm purchase(final User user, @Named("bookId") String bookId) throws Exception {		
+		
+		String emailPurchaser = user.getEmail();
+		
 		//TODO Retorna una clase diferente que no persista con los datos de usuario
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
@@ -314,15 +331,16 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "confirmPurchase", path = "confirmPurchase", httpMethod = HttpMethod.POST)
-	public void confirmPurchase(@Named("emailVendor") String emailVendor, @Named("bookid") String bookId, Transaction transaction) throws Exception {		
+	public void confirmPurchase(final User user, Transaction transaction) throws Exception {		
 		
+		String emailVendor = user.getEmail();
 		//El Id del libro debe tener un confirm en true que indica que alguien lo desea
 		
 		PersonDAO daop = new PersonDAO();
 		Person vendor = daop.load(emailVendor);
 		
 		BookDAO daob = new BookDAO();
-		Book book = daob.load(Long.parseLong(bookId));
+		Book book = daob.load(Long.parseLong(transaction.getBookId()));
 		
 		if(book == null) {
 			System.err.println("El libro no existe en base de datos");
@@ -379,14 +397,17 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "exchange", path = "exchange", httpMethod = HttpMethod.POST)
-	public ContactForm exchange(@Named("emailPurchaser") String emailPurchaser, @Named("bookid") String bookId, @Named("myoffer") String myOfferBookId) throws Exception {		
+	public ContactForm exchange(final User user, ExchangeTransaction exchangeTransaction) throws Exception {		
+		
+		String emailPurchaser = user.getEmail();
+		
 		//TODO Retorna una clase diferente que no persista con los datos de usuario
 		BookDAO daob = new BookDAO();
 		PersonDAO daop = new PersonDAO();
 		
 		Person person = daop.load(emailPurchaser);
-		Book bookWanted = daob.load(Long.parseLong(bookId));
-		Book myBookOffer = daob.load(Long.parseLong(myOfferBookId));
+		Book bookWanted = daob.load(Long.parseLong(exchangeTransaction.getBookId()));
+		Book myBookOffer = daob.load(Long.parseLong(exchangeTransaction.getMyOfferBookId()));
 		
 		
 		if(person == null || bookWanted == null || myBookOffer == null) {
@@ -409,7 +430,7 @@ public class LibreriappApi
 		bookWanted.setConfirmPurchaser(true);	
 		bookWanted.setAvailable(false);
 		bookWanted.setEmailPurchaser(emailPurchaser);
-		bookWanted.setOfferedBook(Long.parseLong(myOfferBookId));
+		bookWanted.setOfferedBook(Long.parseLong(exchangeTransaction.getMyOfferBookId()));
 		
 		daob.save(bookWanted);
 		
@@ -418,15 +439,18 @@ public class LibreriappApi
 	}
 	
 	@ApiMethod(name = "confirmExchange", path = "confirmExchange", httpMethod = HttpMethod.POST)
-	public void confirmExchange(@Named("emailVendor") String emailVendor, @Named("bookid") String bookId, Transaction transaction) throws Exception {		
+	public void confirmExchange(final User user, Transaction transaction) throws Exception {		
+		
+		String emailVendor = user.getEmail();
 		
 		//El Id del libro debe tener un confirm en true que indica que alguien lo desea
+		
 		
 		PersonDAO daop = new PersonDAO();
 		Person vendor = daop.load(emailVendor);
 	
 		BookDAO daob = new BookDAO();
-		Book book = daob.load(Long.parseLong(bookId));
+		Book book = daob.load(Long.parseLong(transaction.getBookId()));
 		
 		if(book == null || vendor==null) {
 			System.err.println("El libro o usuario no existe en base de datos");

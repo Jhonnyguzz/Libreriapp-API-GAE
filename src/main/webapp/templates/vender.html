@@ -25,14 +25,14 @@
 				</label>
 				<ion-list>
 				  <ion-checkbox ng-model="book.exchange">Intercambio</ion-checkbox>
-				  <ion-checkbox ng-model="book.isForSale">Venta</ion-checkbox>
+				  <ion-checkbox ng-model="book.forSale">Venta</ion-checkbox>
 				</ion-list>
 				<label class="item item-input">
 					<span class="input-label">Imagen</span>
 					<input type="file" placeholder="opcional" ng-model="book.picture">
 				</label>
 				<label class="item">
-					<button class="button button-block button-assertive" ng-click="saveABook()" ng-disabled="!book.name || !book.author || !book.description || !book.price || (!book.isForSale && !book.exchange)" type="submit">Vender</button>
+					<button class="button button-block button-assertive" ng-click="saveABook()" ng-disabled="!book.name || !book.author || !book.description || !book.price || (!book.forSale && !book.exchange)" type="submit">Vender</button>
 				</label>
 			</div>
 			</form>

@@ -231,15 +231,16 @@ angular.module('BookStoreApp.controllers', [])
             $scope.tmp = myVar;
             
             gapi.client.libreriapp.listOneBook($scope.bookId).execute(function(resp) {
+            	$scope.$apply(function () {
                     if (!resp.code) {
                             $scope.book = resp.result;
-                            $scope.$apply();
                     }else {
                     	var errorMessage = resp.error.message || '';
                         $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
                         $scope.alertStatus = 'warning';
                         $log.error($scope.messages);
                     }
+            	});
             });
         };
         
@@ -254,39 +255,36 @@ angular.module('BookStoreApp.controllers', [])
 	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
 
 		//Vender
-		
+		//el email del usuario se pasa solo
+	
 		/*
+		$scope.bookForm = {
+			"name": $scope.book.name,
+			"author": $scope.book.author,
+			"description": $scope.book.description,
+			"price": $scope.book.price,
+			"exchange": $scope.book.exchange,
+			"forSale": $scope.book.forSale
+		};*/
 	
-		$scope.email = {
-			"name": $state.$root.email
-		};
-	
-		$scope.theBook = {
-			"name": $state.book.name,
-			"author": $state.book.author,
-			"description": $state.book.description,
-			"price": $state.book.price,
-			"exchange": $state.book.exchange,
-			"forSale": $state.book.isForSale
-		};
-		
-		
 		$scope.saveABook = function () {
 	        $scope.submitted = true;
 	        $scope.loading = true;
 	        
-	        gapi.client.libreriapp.saveBook($scope.email, $scope.theBook).execute(function(resp) {
+	        gapi.client.libreriapp.saveBook($scope.book).execute(function(resp) {
+	        	$scope.$apply(function () {
 	                if (!resp.code) {
-	                        $scope.book = resp.result;
-	                        $scope.$apply();
+	                        Loader.toggleLoadingWithMessage('El libro ha sido agregado!',2000);
 	                }else {
+	                	Loader.toggleLoadingWithMessage('La solicitud ha sido rechazada!',2000);
 	                	var errorMessage = resp.error.message || '';
 	                    $scope.messages = 'Error al guardar libro: ' + errorMessage;
 	                    $scope.alertStatus = 'warning';
 	                    $log.error($scope.messages);
 	                }
+	        	});
 	        });
-	    };*/
+	    };
 
 	}
 ])    
