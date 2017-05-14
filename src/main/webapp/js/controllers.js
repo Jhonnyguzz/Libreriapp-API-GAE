@@ -215,8 +215,8 @@ angular.module('BookStoreApp.controllers', [])
         //showAllBooks();
     })
     
-.controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader', 'oauth2Provider',
-	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
+.controller('singleBookCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
 
 		var myVar = $state.params.bookId;
 		
@@ -251,88 +251,63 @@ angular.module('BookStoreApp.controllers', [])
 	}
 ])    
 
-.controller('venderCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader', 'oauth2Provider',
-	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
+.controller('venderCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
 
 		//Vender
 		//el email del usuario se pasa solo
 	
 		/*
 		$scope.bookForm = {
-			"name": $scope.book.name,
-			"author": $scope.book.author,
-			"description": $scope.book.description,
-			"price": $scope.book.price,
-			"exchange": $scope.book.exchange,
-			"forSale": $scope.book.forSale
-		};*/
+			"name": "50 sombras de grey",
+			"author": "abrams",
+			"description": "El libro erotico que enloquece en el siglo 21",
+			"price": 12000,
+			"exchange": true,
+			"forSale": true
+		}; */
+	
+		//var bookForm = {};
+		
+		//bookForm.name = $scope.book.name;
+		//bookForm.author = $scope.book.author;
+		//bookForm.description = $scope.book.description;
+		//bookForm.price = $scope.book.price;
+		//bookForm.exchange = $scope.book.exchange;
+		//bookForm.forSale = $scope.book.forSale;
+	
+		/*$scope.bookForm = {};
+		
+		$scope.bookForm.name = $scope.newbook.name;
+		$scope.bookForm.author = $scope.newbook.author;
+		$scope.bookForm.description = $scope.newbook.description;
+		$scope.bookForm.price = $scope.newbook.price;
+		$scope.bookForm.exchange = $scope.newbook.exchange;
+		$scope.bookForm.forSale = $scope.newbook.forSale;*/
+
 	
 		$scope.saveABook = function () {
-	        $scope.submitted = true;
-	        $scope.loading = true;
-	        
-	        gapi.client.libreriapp.saveBook($scope.book).execute(function(resp) {
+			
+			$scope.bookForm = {
+				"name": $scope.namebook,
+				"author": $scope.authorbook,
+				"description": $scope.descriptionbook,
+				"price": $scope.pricebook,
+				"exchange": $scope.exchangebook,
+				"forSale": $scope.forSalebook
+			}; 
+			
+	        gapi.client.libreriapp.saveBook($scope.bookForm).execute(function(resp) {
 	        	$scope.$apply(function () {
 	                if (!resp.code) {
 	                        Loader.toggleLoadingWithMessage('El libro ha sido agregado!',2000);
 	                }else {
 	                	Loader.toggleLoadingWithMessage('La solicitud ha sido rechazada!',2000);
-	                	var errorMessage = resp.error.message || '';
-	                    $scope.messages = 'Error al guardar libro: ' + errorMessage;
-	                    $scope.alertStatus = 'warning';
-	                    $log.error($scope.messages);
 	                }
 	        	});
 	        });
 	    };
 
-	}
-])    
-
-.controller('BookCtrl', ['$scope', '$state', 'LSFactory', 'AuthFactory', '$rootScope', 'UserFactory', 'Loader', 'oauth2Provider',
-	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
-
-		var bookId = $state.params.bookId;
-		$scope.book = LSFactory.get(bookId);
-		
-		$scope.listOneBook = function () {
-            $scope.submitted = true;
-            $scope.loading = true;
-            
-            //console.log("BookId");
-    		//console.log(BookId);
-            
-            gapi.client.libreriapp.listOneBook($state.params.bookId).execute(function(resp) {
-                    if (!resp.code) {
-                            $scope.book = resp.result;
-                    }
-            });
-        };
-
-		$scope.$on('addToCart', function() {
-			Loader.showLoading('Adding to Cart..');
-			UserFactory.addToCart({
-				id: bookId,
-				qty: 1
-			}).success(function(data) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage('Successfully added ' + $scope.book.title + ' to your cart', 2000);
-			}).error(function(err, statusCode) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage(err.message);
-			});
-		});
-
-		$scope.addToCart = function() {
-			if (!oauth2Provider.signedIn) {
-				$rootScope.$broadcast('showLoginModal', $scope, null, function() {
-					// user is now logged in
-					$scope.$broadcast('addToCart');
-				});
-				return;
-			}
-			$scope.$broadcast('addToCart');
-		}
 	}
 ])
 

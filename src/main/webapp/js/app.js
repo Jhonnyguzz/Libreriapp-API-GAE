@@ -70,6 +70,16 @@ angular.module('BookStoreApp', ['ionic', 'BookStoreApp.controllers', 'BookStoreA
             }
         })
 
+        .state('app.vender', {
+        	url: "/vender",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/vender.html",
+        			controller: 'venderCtrl'
+        		}
+        	}
+        })
+        
         .state('app.cart', {
             url: "/cart",
             views: {
@@ -80,15 +90,6 @@ angular.module('BookStoreApp', ['ionic', 'BookStoreApp.controllers', 'BookStoreA
             }
         })
         
-        .state('app.vender', {
-            url: "/vender",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/vender.html",
-                    controller: 'venderCtrl'
-                }
-            }
-        })
 
         .state('app.purchases', {
             url: "/purchases",

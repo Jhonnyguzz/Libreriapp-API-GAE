@@ -1,4 +1,4 @@
-<ion-view view-title="Vende un libro" hide-back-button="true">
+<ion-view view-title="Vender un libro" hide-back-button="true">
 	<ion-content>
 			
 		<ion-header-bar>
@@ -9,31 +9,32 @@
 			<div class="list">
 				<label class="item item-input">
 					<span class="input-label">Nombre</span>
-					<input type="text" placeholder="Nombre" ng-model="book.name">
+					<input type="text" placeholder="Nombre" ng-model="namebook">
 				</label>
 				<label class="item item-input">
 					<span class="input-label">Autor</span>
-					<input type="text" placeholder="Autor" ng-model="book.author">
+					<input type="text" placeholder="Autor" ng-model="authorbook">
 				</label>
 				<label class="item item-input">
 					<span class="input-label">Descripcion</span>
-					<input type="text" placeholder="Descripcion" ng-model="book.description">
+					<input type="text" placeholder="Descripcion" ng-model="descriptionbook">
 				</label>
 				<label class="item item-input">
 					<span class="input-label">Precio</span>
-					<input type="number" placeholder="Sin puntos, comas o simbolos especiales" ng-model="book.price">
+					<input type="number" placeholder="Sin puntos, comas o simbolos especiales" ng-model="pricebook">
 				</label>
 				<ion-list>
-				  <ion-checkbox ng-model="book.exchange">Intercambio</ion-checkbox>
-				  <ion-checkbox ng-model="book.forSale">Venta</ion-checkbox>
+				  <ion-checkbox ng-model="exchangebook">Intercambio</ion-checkbox>
+				  <ion-checkbox ng-model="forSalebook">Venta</ion-checkbox>
 				</ion-list>
 				<label class="item item-input">
 					<span class="input-label">Imagen</span>
-					<input type="file" placeholder="opcional" ng-model="book.picture">
+					<input type="file" placeholder="opcional" ng-model="picturebook">
 				</label>
 				<label class="item">
-					<button class="button button-block button-assertive" ng-click="saveABook()" ng-disabled="!book.name || !book.author || !book.description || !book.price || (!book.forSale && !book.exchange)" type="submit">Vender</button>
+					<button class="button button-block button-assertive" ng-click="saveABook()" ng-disabled="!namebook || !authorbook || !descriptionbook || !pricebook || (!forSalebook && !exchangebook)" type="submit">Vender</button>
 				</label>
+
 			</div>
 			</form>
 		</ion-content>
