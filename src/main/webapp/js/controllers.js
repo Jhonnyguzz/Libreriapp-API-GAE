@@ -104,7 +104,7 @@ angular.module('BookStoreApp.controllers', [])
 			                			};
 				                        
 				                        Loader.showLoading();
-				                        saveAPerson($scope.person);
+				                        $scope.saveAPerson($scope.person);
 				                        
 				                        $scope.$root.email = resp.email; 
 				                        $scope.$root.name = resp.name;
@@ -242,6 +242,10 @@ angular.module('BookStoreApp.controllers', [])
                     }
             });
         };
+        
+        $scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.listOneBook();
+        });
 
 	}
 ])    
@@ -250,6 +254,39 @@ angular.module('BookStoreApp.controllers', [])
 	function($scope, $state, LSFactory, AuthFactory, $rootScope, UserFactory, Loader, oauth2Provider) {
 
 		//Vender
+		
+		/*
+	
+		$scope.email = {
+			"name": $state.$root.email
+		};
+	
+		$scope.theBook = {
+			"name": $state.book.name,
+			"author": $state.book.author,
+			"description": $state.book.description,
+			"price": $state.book.price,
+			"exchange": $state.book.exchange,
+			"forSale": $state.book.isForSale
+		};
+		
+		
+		$scope.saveABook = function () {
+	        $scope.submitted = true;
+	        $scope.loading = true;
+	        
+	        gapi.client.libreriapp.saveBook($scope.email, $scope.theBook).execute(function(resp) {
+	                if (!resp.code) {
+	                        $scope.book = resp.result;
+	                        $scope.$apply();
+	                }else {
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Error al guardar libro: ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        });
+	    };*/
 
 	}
 ])    
