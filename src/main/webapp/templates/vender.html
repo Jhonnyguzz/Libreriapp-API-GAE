@@ -5,7 +5,7 @@
 			<h1 class="title">Vender un libro</h1>
 		</ion-header-bar>
 		<ion-content>
-			<form>
+			<form ng-submit="saveABook()">
 			<div class="list">
 				<label class="item item-input">
 					<span class="input-label">Nombre</span>
@@ -32,7 +32,7 @@
 					<input type="file" placeholder="opcional" ng-model="picturebook">
 				</label>
 				<label class="item">
-					<button class="button button-block button-assertive" ng-click="saveABook()" ng-disabled="!namebook || !authorbook || !descriptionbook || !pricebook || (!forSalebook && !exchangebook)" type="submit">Vender</button>
+					<button class="button button-block button-assertive" ng-disabled="!namebook || !authorbook || !descriptionbook || !pricebook || (!forSalebook && !exchangebook)" type="submit">Vender</button>
 				</label>
 
 			</div>

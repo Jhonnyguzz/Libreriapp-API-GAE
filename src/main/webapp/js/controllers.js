@@ -288,13 +288,15 @@ angular.module('BookStoreApp.controllers', [])
 	
 		$scope.saveABook = function () {
 			
+			//alert(this.namebook + " " + this.authorbook);
+			
 			$scope.bookForm = {
-				"name": $scope.namebook,
-				"author": $scope.authorbook,
-				"description": $scope.descriptionbook,
-				"price": $scope.pricebook,
-				"exchange": $scope.exchangebook,
-				"forSale": $scope.forSalebook
+				"name": this.namebook,
+				"author": this.authorbook,
+				"description": this.descriptionbook,
+				"price": this.pricebook,
+				"exchange": this.exchangebook,
+				"forSale": this.forSalebook
 			}; 
 			
 	        gapi.client.libreriapp.saveBook($scope.bookForm).execute(function(resp) {
