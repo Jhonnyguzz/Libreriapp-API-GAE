@@ -43,7 +43,7 @@ public class BookDAO implements IBookDAO
 	
 	public List<Book> getAvailableBooks()
 	{
-		Query<Book> q = ofy().load().type( Book.class ).filter("isAvailable", Boolean.FALSE);
+		Query<Book> q = ofy().load().type( Book.class ).filter("isAvailable", Boolean.TRUE);
 		return new ArrayList<Book>( q.list() );
 	} 
 }

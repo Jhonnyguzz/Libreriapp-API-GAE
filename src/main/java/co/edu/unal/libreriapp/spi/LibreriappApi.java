@@ -108,20 +108,17 @@ public class LibreriappApi
         BookDAO bookDao = new BookDAO();
         List<Book> books = new ArrayList<>(bookDao.getAll());
         
-        System.out.println(books.size());
+        ArrayList<Book> filterBooks = new ArrayList<>();
         
-        int tam = books.size();
-        
-        //This is just a test
-    	for (int i = 0; i < tam; i++) 
+    	for (int i = 0; i < books.size(); i++) 
     	{
     		//Filtrado, porque con objectify no quiso servir
-    		if(!books.get(i).isAvailable())
-    			books.remove(i);
-    		System.out.println(books.get(i).toString()+" and is from "+ books.get(i).getPerson().get());
+    		if(books.get(i).isAvailable())
+    			filterBooks.add(books.get(i));
+    		//System.out.println(books.get(i).toString()+" and is from "+ books.get(i).getPerson().get());
     	}
     	
-        return books;
+        return filterBooks;
     }
 	
 	@ApiMethod(name = "listOneBook", path = "listOneBook", httpMethod = HttpMethod.POST)
