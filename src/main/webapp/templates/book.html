@@ -23,19 +23,35 @@
 				</p>
 				<p class="row">
 					<label class="col">
-						Rating : <i class="icon ion-star" ng-repeat="i in getNumber(book.rating) track by $index"></i>
+						Disponible para intercambio : <i class="icon ion-checkmark" ng-show="{{book.exchange}}"></i> <i class="icon ion-close-round" ng-hide="{{book.exchange}}"></i>
 					</label>
 					<label class="col">
-						Precio :
-						<label class="subdued">{{::book.price}} $</label>
+						Disponible para compra : <i class="icon ion-checkmark" ng-show="{{book.forSale}}"></i> <i class="icon ion-close-round" ng-hide="{{book.forSale}}"></i>
+					</label>
+					<label class="col">
+						Precio : <label class="subdued">{{::book.price}} $</label>
 					</label>
 				</p>
+				<!--
+				<ion-item>
+				    <ion-label>Selecciona el libro que deseas ofrecer</ion-label>
+				    <ion-select type="text">
+				        <ion-option *ngFor="#book of myBooks" value="{{book.id}}">{{book.name}}</ion-option> 
+				    </ion-select>
+				</ion-item> -->
 				
-				<button class="button button-assertive button-block" ng-hide="!isAuthenticated" ng-click="addToCart()">
+				<form>
+					<div class="list">
+						<label class="item item-input">Id del libro a intercambiar:
+				  		<input type="search" placeholder="  Id del libro (Lo puedes verificar en tu biblioteca) " ng-hide="!isAuthenticated" ng-model="chosenBook">
+						</label>
+					</div>
+				</form>
+				<button class="button button-assertive button-block" ng-hide="!isAuthenticated" ng-disabled="!{{book.exchange}}" ng-click="exchangeBook()">
 					Intercambiar
 				</button>
 				
-				<button class="button button-assertive button-block" ng-hide="!isAuthenticated" ng-click="addToCart()">
+				<button class="button button-assertive button-block" ng-hide="!isAuthenticated" ng-disabled="!{{book.forSale}}" ng-click="buy()">
 					Comprar
 				</button>
 			</div>

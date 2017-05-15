@@ -47,6 +47,23 @@ public class LibreriappApi
         return p;
     }
 	
+	@ApiMethod(name = "getPerson", path = "getPerson", httpMethod = HttpMethod.POST)
+	public Person getPerson(final User user) throws Exception {
+
+        //String mainEmail = person.getEmail();
+		String mainEmail = user.getEmail();
+		
+        PersonDAO personDao = new PersonDAO();
+        Person p = personDao.load(mainEmail);
+        
+        if(p!=null) {
+        	return p;
+        }else {
+        	System.err.println("El usuario no existe en la base de datos");
+        	throw new Exception("El usuario no existe en la base de datos");
+        }
+    }
+	
 	@ApiMethod(name = "editPerson", path = "editPerson", httpMethod = HttpMethod.POST)
 	public Person editPerson(final User user, PersonForm person) throws Exception {
 
@@ -91,9 +108,14 @@ public class LibreriappApi
         BookDAO bookDao = new BookDAO();
         List<Book> books = new ArrayList<>(bookDao.getAll());
         
+        System.out.println(books.size());
+        
         //This is just a test
     	for (int i = 0; i < books.size(); i++) 
     	{
+    		//Filtrado, porque con objectify no quiso servir
+    		if(!books.get(i).isAvailable())
+    			books.remove(i);
     		System.out.println(books.get(i).toString()+" and is from "+ books.get(i).getPerson().get());
     	}
     	
@@ -244,10 +266,65 @@ public class LibreriappApi
 		List<Book> myOwnBooks = new ArrayList<>();
 		
 		for (Ref<Book> obj : myRefBooks) {
-			myOwnBooks.add(obj.get());
+			if(obj.get().isAvailable()) {
+				myOwnBooks.add(obj.get());
+				System.out.println(obj.get().toString());
+			}
 		}
 		
 		return myOwnBooks;
+	}
+	
+	@ApiMethod(name = "listMyPurchases", path = "listMyPurchases", httpMethod = HttpMethod.POST)
+	public List<Book> listMyPurchases(final User user) throws Exception {		
+		
+		String email = user.getEmail();
+		
+		PersonDAO dao = new PersonDAO();
+		Person person = dao.load(email);
+		
+		if(person==null) {
+			System.err.println("El usuario no existe en el base de datos");
+			throw new Exception("User does not exist in database");
+		}
+		
+		List<Ref<Book>> myRefBooks = person.getMyBooks();
+		List<Book> myPurchaseBooks = new ArrayList<>();
+		
+		for (Ref<Book> obj : myRefBooks) {
+			if(!obj.get().isAvailable() && obj.get().isBuy() && obj.get().isConfirmPurchaser() && obj.get().isConfirmVendor()) {
+				myPurchaseBooks.add(obj.get());
+				System.out.println(obj.get().toString());
+			}
+		}
+		
+		return myPurchaseBooks;
+	}
+	
+	@ApiMethod(name = "listMyExchanges", path = "listMyExchanges", httpMethod = HttpMethod.POST)
+	public List<Book> listMyExchanges(final User user) throws Exception {		
+		
+		String email = user.getEmail();
+		
+		PersonDAO dao = new PersonDAO();
+		Person person = dao.load(email);
+		
+		if(person==null) {
+			System.err.println("El usuario no existe en el base de datos");
+			throw new Exception("User does not exist in database");
+		}
+		
+		List<Ref<Book>> myRefBooks = person.getMyBooks();
+		List<Book> myExchangeBooks = new ArrayList<>();
+		
+		for (Ref<Book> obj : myRefBooks) {
+			if(!obj.get().isAvailable() && !obj.get().isBuy() && obj.get().isConfirmPurchaser() && obj.get().isConfirmVendor()) {
+				myExchangeBooks.add(obj.get());
+				System.out.println(obj.get().toString());
+			}
+		}
+		
+		return myExchangeBooks;
 	}
 	
 	@ApiMethod(name = "showUserRequestPurchase", path = "showUserRequestPurchase", httpMethod = HttpMethod.POST)
@@ -266,9 +343,12 @@ public class LibreriappApi
 		List<Ref<Book>> myRefBooks = person.getMyBooks();
 		List<Book> myRequestPurchaseBooks = new ArrayList<>();
 		
+		//confirmVendor deberia ser falso
 		for (Ref<Book> obj : myRefBooks) {
-			if(obj.get().isConfirmPurchaser() && obj.get().isForSale() && !obj.get().isAvailable())
+			if(obj.get().isConfirmPurchaser() && obj.get().isForSale() && !obj.get().isAvailable() && obj.get().isBuy()) {
 				myRequestPurchaseBooks.add(obj.get());
+				System.out.println(obj.get().toString());
+			}
 		}
 		
 		return myRequestPurchaseBooks;
@@ -290,9 +370,12 @@ public class LibreriappApi
 		List<Ref<Book>> myRefBooks = person.getMyBooks();
 		List<Book> myRequestExchangeBooks = new ArrayList<>();
 		
+		//confirmVendor deberia ser falso
 		for (Ref<Book> obj : myRefBooks) {
-			if(obj.get().isConfirmPurchaser() && obj.get().isExchange() && !obj.get().isAvailable())
+			if(obj.get().isConfirmPurchaser() && obj.get().isExchange() && !obj.get().isAvailable() && !obj.get().isBuy()) {
 				myRequestExchangeBooks.add(obj.get());
+				System.out.println(obj.get().toString());
+			}
 		}
 		
 		return myRequestExchangeBooks;
@@ -321,6 +404,7 @@ public class LibreriappApi
 		//Confirmo que el comprador compra en el libro
 		book.setConfirmPurchaser(true);	
 		book.setAvailable(false);
+		book.setBuy(true);
 		book.setEmailPurchaser(emailPurchaser);
 		
 		daob.save(book);
@@ -429,6 +513,7 @@ public class LibreriappApi
 		//Confirmo que el comprador compra en el libro
 		bookWanted.setConfirmPurchaser(true);	
 		bookWanted.setAvailable(false);
+		bookWanted.setBuy(false);
 		bookWanted.setEmailPurchaser(emailPurchaser);
 		bookWanted.setOfferedBook(Long.parseLong(exchangeTransaction.getMyOfferBookId()));
 		

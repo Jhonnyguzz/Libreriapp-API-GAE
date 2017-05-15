@@ -80,26 +80,96 @@ angular.module('BookStoreApp', ['ionic', 'BookStoreApp.controllers', 'BookStoreA
         	}
         })
         
-        .state('app.cart', {
-            url: "/cart",
+        .state('app.mylibrary', {
+        	url: "/mylibrary",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/mylibrary.html",
+        			controller: 'mylibraryCtrl'
+        		}
+        	}
+        })
+        
+        .state('app.mypurchases', {
+        	url: "/mypurchases",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/mypurchases.html",
+        			controller: 'mypurchasesCtrl'
+        		}
+        	}
+        })
+        
+        .state('app.myexchanges', {
+        	url: "/myexchanges",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/myexchanges.html",
+        			controller: 'myexchangesCtrl'
+        		}
+        	}
+        })
+        
+        .state('app.transactions', {
+        	url: "/transactions",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/transactions.html",
+        			controller: 'transactionsCtrl'
+        		}
+        	}
+        })
+        
+        .state('app.pendingpurchases', {
+        	url: "/pendingpurchases",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/pendingpurchases.html",
+        			controller: 'pendingpurchasesCtrl'
+        		}
+        	}
+        })
+        
+        .state('app.pendingexchanges', {
+        	url: "/pendingexchanges",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/pendingexchanges.html",
+        			controller: 'pendingexchangesCtrl'
+        		}
+        	}
+        })
+        
+        .state('app.bookforpurchase', {
+            url: "/bookforpurchase/:bookId",
             views: {
                 'menuContent': {
-                    templateUrl: "templates/cart.html",
-                    controller: 'CartCtrl'
+                    templateUrl: "templates/bookforpurchase.html",
+                    controller: 'bookforpurchaseCtrl'
                 }
             }
         })
         
-
-        .state('app.purchases', {
-            url: "/purchases",
+        .state('app.bookforexchange', {
+            url: "/bookforexchange/:bookId",
             views: {
                 'menuContent': {
-                    templateUrl: "templates/purchases.html",
-                    controller: 'PurchasesCtrl'
+                    templateUrl: "templates/bookforexchange.html",
+                    controller: 'bookforexchangeCtrl'
                 }
             }
-        });
+        })
+        
+        .state('app.profile', {
+        	url: "/profile",
+        	views: {
+        		'menuContent': {
+        			templateUrl: "templates/profile.html",
+        			controller: 'profileCtrl'
+        		}
+        	}
+        })
+  
         // if none of the above states are matched, use this as the fallback
         $urlRouterProvider.otherwise('/app/browse');
     }

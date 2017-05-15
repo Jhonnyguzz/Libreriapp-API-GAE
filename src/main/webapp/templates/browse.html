@@ -25,10 +25,12 @@
 						<h2>{{::thebooks[i].name}}</h2>
 						<h2>{{::thebooks[i].author}}</h2>
 						<p>{{::thebooks[i].description}}</p>
+						<!--
 						<p>
-						 	<!-- Aqui posiblemente va la calificacion del libro --> 
+						 	Aqui posiblemente va la calificacion del libro
 							<i class="icon ion-star" ng-repeat="i in getNumber(thebooks[i].rating) track by $index"></i>
-						</p>
+						</p> -->
+						<label class="subdued">{{::thebooks[i].price}} $</label>
 					</div>
 				</ion-item>
 			</div>	

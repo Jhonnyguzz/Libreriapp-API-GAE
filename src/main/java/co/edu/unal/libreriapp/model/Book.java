@@ -40,7 +40,7 @@ public class Book implements Serializable
 	//For exchanges
 	private boolean confirmVendor;
 	private boolean confirmPurchaser;
-	private boolean isAvailable = true;
+	@Index private boolean isAvailable = true;
 	
 	//si buy es true lo quieren comprar, sino es intercambio es false
 	private String emailPurchaser;

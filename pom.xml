@@ -182,7 +182,7 @@ limitations under the License.
         <artifactId>appengine-maven-plugin</artifactId>
         <version>${appengine.maven.plugin.version}</version>
         <configuration>
-       		<port>9991</port>
+       		<port>8080</port>
         </configuration>
       </plugin>
     </plugins>

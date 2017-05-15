@@ -1,0 +1,33 @@
+<ion-nav-bar class="bar-assertive">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="showUserRequestExchange()"></a>
+	</ion-nav-buttons>
+</ion-nav-bar>
+<ion-view view-title="Intercambios pendientes y por confirmar" hide-back-button="true">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="showUserRequestExchange()"></a>
+	</ion-nav-buttons>
+	<ion-content>
+		<ion-list>
+		<!-- Aqui va la barra de busqueda -->
+			<div ng-repeat="book in thebooks6 track by $index" class="row responsive-sm" ng-if="$index % 2 == 0">
+				<!-- el tag de abajo es el que al darle click redirecciona a mas informacion del libro -->
+				<ion-item class="col-50" ng-repeat="i in [$index, $index + 1]" ng-if="thebooks6[i] != null" ng-href="#/app/bookforexchange/{{::thebooks6[i].id}}">
+					<div class="item-thumbnail-left">
+						<img ng-src="https://escritoradebolsillo.files.wordpress.com/2015/06/librosss.jpg">
+						<h2>{{::thebooks6[i].name}}</h2>
+						<h2>{{::thebooks6[i].author}}</h2>
+						<p>{{::thebooks6[i].description}}</p>
+						<p>email@email.com</p>
+						<!--
+						<p>
+						 	Aqui posiblemente va la calificacion del libro
+							<i class="icon ion-star" ng-repeat="i in getNumber(thebooks[i].rating) track by $index"></i>
+						</p> -->
+						Precio de referencia: <label class="subdued">{{::thebooks6[i].price}} $</label>
+					</div>
+				</ion-item>
+			</div>	
+		</ion-list>
+	</ion-content>
+</ion-view>

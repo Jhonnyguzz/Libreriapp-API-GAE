@@ -17,6 +17,11 @@
 			<h1 class="title">Menu</h1>
 		</ion-header-bar>
 		<ion-content>
+			<div class="item item-avatar" ng-hide="!isAuthenticated">
+				<img ng-src="{{urlPicture}}">
+				<h3>{{name}}</h3>
+				<h3>{{email}}</h3>
+			</div>
 			<ion-list>
 				<ion-item menu-close href="#/app/browse">
 					Libros disponibles
@@ -24,19 +29,26 @@
 				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/vender">
 					Vender
 				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#">
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/mylibrary">
+					Tu biblioteca
+				</ion-item>
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/mypurchases">
 					Tus compras
 				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#">
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/myexchanges">
 					Tus intercambios
 				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/cart">
+				<!--  
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/transactions">
+					Transacciones pendientes
+				</ion-item> -->
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/pendingpurchases">
 					Ventas pendientes
 				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/purchases">
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/pendingexchanges">
 					Intercambios pendientes
 				</ion-item>
-				<ion-item menu-close ng-hide="!isAuthenticated" href="#">
+				<ion-item menu-close ng-hide="!isAuthenticated" href="#/app/profile">
 					Perfil
 				</ion-item>
 				<ion-item menu-close ng-show="isAuthenticated" ng-click="signOut()">

@@ -65,7 +65,7 @@ angular.module('BookStoreApp.controllers', [])
 
 		            			//El API retorna aca el usuario pero no lo necesito
 		            			//por el momento
-		            			$scope.falla = "hola men :v";
+		            			$scope.falla = "Perfil salvado con exito";
 		            		}
 		            		else {
 		                    	var errorMessage = resp.error.message || '';
@@ -108,6 +108,7 @@ angular.module('BookStoreApp.controllers', [])
 				                        
 				                        $scope.$root.email = resp.email; 
 				                        $scope.$root.name = resp.name;
+				                        $scope.$root.urlPicture = resp.picture;
 				                        	
 				                        //Ocultar el toggle
 				                        Loader.hideLoading();
@@ -244,6 +245,47 @@ angular.module('BookStoreApp.controllers', [])
             });
         };
         
+        $scope.buy = function () {
+            gapi.client.libreriapp.purchase($scope.bookId).execute(function(resp) {
+            	$scope.$apply(function () {
+                    if (!resp.code) {
+                    	Loader.toggleLoadingWithMessage('Contactar a ' + resp.result.emailVendor + ' para concretar la compra',2000);
+                    	$state.go('app.browse');
+                    }else {
+                    	Loader.toggleLoadingWithMessage('La solicitud ha sido rechazada!',2000);
+                    	var errorMessage = resp.error.message || '';
+                        $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+                        $scope.alertStatus = 'warning';
+                        $log.error($scope.messages);
+                    }
+            	});
+            });
+        };
+        
+        $scope.exchangeBook = function () {
+        	
+        	//TODO
+        	$scope.exchangeTransaction = {
+    			"bookId": myVar,
+    			"myOfferBookId": $scope.chosenBook
+    		};
+        	
+            gapi.client.libreriapp.exchange($scope.exchangeTransaction).execute(function(resp) {
+            	$scope.$apply(function () {
+                    if (!resp.code) {
+                    	Loader.toggleLoadingWithMessage('Contactar a ' + resp.result.emailVendor + ' para concretar el intercambio',2000);
+                    	$state.go('app.browse');
+                    }else {
+                    	Loader.toggleLoadingWithMessage('La solicitud ha sido rechazada!',2000);
+                    	var errorMessage = resp.error.message || '';
+                        $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+                        $scope.alertStatus = 'warning';
+                        $log.error($scope.messages);
+                    }
+            	});
+            });
+        };
+        
         $scope.$on('$ionicView.beforeEnter', function(){
         	$scope.listOneBook();
         });
@@ -303,6 +345,16 @@ angular.module('BookStoreApp.controllers', [])
 	        	$scope.$apply(function () {
 	                if (!resp.code) {
 	                        Loader.toggleLoadingWithMessage('El libro ha sido agregado!',2000);
+	                        
+	                        //Limpiar el formulario
+	                        //this.namebook = "";
+	        				//this.authorbook = "";
+	        				//this.descriptionbook = "";
+	        				//this.pricebook = "";
+	        				//this.exchangebook = "";
+	        				//this.forSalebook = "";
+	                        
+	                        $state.go('app.browse');
 	                }else {
 	                	Loader.toggleLoadingWithMessage('La solicitud ha sido rechazada!',2000);
 	                }
@@ -313,112 +365,397 @@ angular.module('BookStoreApp.controllers', [])
 	}
 ])
 
-.controller('CartCtrl', ['$scope', 'AuthFactory', '$rootScope', '$location', '$timeout', 'UserFactory', 'Loader', 'oauth2Provider',
-	function($scope, AuthFactory, $rootScope, $location, $timeout, UserFactory, Loader, oauth2Provider) {
+.controller('mylibraryCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		$scope.showMyBooks = function () {
+			Loader.showLoading();
+		    $scope.loading = true;
+		    gapi.client.libreriapp.myBooks().execute(function(resp) {
+		    	$scope.$apply(function () {
+		    		if (!resp.code) {
+		                resp.items = resp.items || [];
+		                
+		                
+		                $scope.thebooks4 = [];
+		                $scope.justtest = resp.items;
+		                angular.forEach(resp.items, function(book) {
+		                	$scope.thebooks4.push(book);
+		                });
+		                
+		                //$scope.$apply();
+		                Loader.hideLoading();
+		    		}
+		    	});                   
+		    });
+		};
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.showMyBooks();
+        });
 
-		$scope.$on('getCart', function() {
-			Loader.showLoading('Fetching Your Cart..');
-			UserFactory.getCartItems().success(function(data) {
-				$scope.books = data.data;
-				Loader.hideLoading();
-			}).error(function(err, statusCode) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage(err.message);
-			});
-		});
-
-		if (!oauth2Provider.signedIn) {
-			$rootScope.$broadcast('showLoginModal', $scope, function() {
-				// cancel auth callback
-				$timeout(function() {
-					$location.path('/app/browse');
-				}, 200);
-			}, function() {
-				// user is now logged in
-				$scope.$broadcast('getCart');
-			});
-			return;
-		}
-
-		$scope.$broadcast('getCart');
-
-		$scope.checkout = function() {
-		   // we need to send only the id and qty
-			var _cart = $scope.books;
-			var cart = [];
-			for (var i = 0; i < _cart.length; i++) {
-				cart.push({
-					id: _cart[i]._id,
-					qty: 1 // hardcoded to 1
-				});
-			}
-
-			Loader.showLoading('Checking out..');
-			UserFactory.addPurchase(cart).success(function(data) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage('Successfully checked out', 2000);
-				$scope.books = [];
-			}).error(function(err, statusCode) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage(err.message);
-			});
-		}
 	}
 ])
 
-.controller('PurchasesCtrl', ['$scope', '$rootScope', 'AuthFactory', 'UserFactory', '$timeout', 'Loader', 'oauth2Provider',
-	function($scope, $rootScope, AuthFactory, UserFactory, $timeout, Loader, oauth2Provider) {
-		// http://forum.ionicframework.com/t/expandable-list-in-ionic/3297/2
-		$scope.groups = [];
-
-		$scope.toggleGroup = function(group) {
-			if ($scope.isGroupShown(group)) {
-				$scope.shownGroup = null;
-			} else {
-				$scope.shownGroup = group;
-			}
+.controller('mypurchasesCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		$scope.showMyPurchases = function () {
+			Loader.showLoading();
+		    $scope.loading = true;
+		    gapi.client.libreriapp.listMyPurchases().execute(function(resp) {
+		    	$scope.$apply(function () {
+		    		if (!resp.code) {
+		                resp.items = resp.items || [];
+		                
+		                
+		                $scope.thebooks2 = [];
+		                $scope.justtest = resp.items;
+		                angular.forEach(resp.items, function(book) {
+		                	$scope.thebooks2.push(book);
+		                });
+		                
+		                //$scope.$apply();
+		                Loader.hideLoading();
+		    		}
+		    	});                   
+		    });
 		};
-		$scope.isGroupShown = function(group) {
-			return $scope.shownGroup === group;
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.showMyPurchases();
+        });
+
+	}
+])
+
+.controller('myexchangesCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		$scope.showMyExchanges = function () {
+			Loader.showLoading();
+		    $scope.loading = true;
+		    gapi.client.libreriapp.listMyExchanges().execute(function(resp) {
+		    	$scope.$apply(function () {
+		    		if (!resp.code) {
+		                resp.items = resp.items || [];
+		                
+		                
+		                $scope.thebooks3 = [];
+		                $scope.justtest = resp.items;
+		                angular.forEach(resp.items, function(book) {
+		                	$scope.thebooks3.push(book);
+		                });
+		                
+		                //$scope.$apply();
+		                Loader.hideLoading();
+		    		}
+		    	});                   
+		    });
 		};
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.Exchanges();
+        });
 
-		$scope.$on('getPurchases', function() {
-			Loader.showLoading('Fetching Your Purchases');
-			UserFactory.getPurchases().success(function(data) {
-				var purchases = data.data;
-				$scope.purchases = [];
-				for (var i = 0; i < purchases.length; i++) {
-					var key = Object.keys(purchases[i]);
-					$scope.purchases.push(key[0]);
-					$scope.groups[i] = {
-						name: key[0],
-						items: purchases[i][key]
-					};
-					var sum = 0;
-					for (var j = 0; j < purchases[i][key].length; j++) {
-						sum += parseInt(purchases[i][key][j].price);
-					}
-					$scope.groups[i].total = sum;
-				}
-				Loader.hideLoading();
-			}).error(function(err, statusCode) {
-				Loader.hideLoading();
-				Loader.toggleLoadingWithMessage(err.message);
-			});
-		});
+	}
+])
 
-		if (!oauth2Provider.signedIn) {
-			$rootScope.$broadcast('showLoginModal', $scope, function() {
-				// cancel auth callback
-				$timeout(function() {
-					$location.path('/app/browse');
-				}, 200);
-			}, function() {
-				// user is now logged in
-				$scope.$broadcast('getPurchases');
-			});
-			return;
-		}
-		$scope.$broadcast('getPurchases');
+.controller('transactionsCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		$scope.pendingTransactions = function () {
+			Loader.showLoading();
+		    $scope.loading = true;
+		    gapi.client.libreriapp.pendingTransactions().execute(function(resp) {
+		    	$scope.$apply(function () {
+		    		if (!resp.code) {
+		                resp.items = resp.items || [];
+		                
+		                
+		                $scope.thebooks7 = [];
+		                $scope.justtest = resp.items;
+		                angular.forEach(resp.items, function(book) {
+		                	$scope.thebooks7.push(book);
+		                });
+		                
+		                //$scope.$apply();
+		                Loader.hideLoading();
+		    		}
+		    	});                   
+		    });
+		};
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.pendingTransactions();
+        });
+
+	}
+])
+
+.controller('pendingpurchasesCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		$scope.showUserRequestPurchase = function () {
+			Loader.showLoading();
+		    $scope.loading = true;
+		    gapi.client.libreriapp.showUserRequestPurchase().execute(function(resp) {
+		    	$scope.$apply(function () {
+		    		if (!resp.code) {
+		                resp.items = resp.items || [];
+		                
+		                
+		                $scope.thebooks5 = [];
+		                $scope.justtest = resp.items;
+		                angular.forEach(resp.items, function(book) {
+		                	$scope.thebooks5.push(book);
+		                });
+		                
+		                //$scope.$apply();
+		                Loader.hideLoading();
+		    		}
+		    	});                   
+		    });
+		};
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.showUserRequestPurchase();
+        });
+
+	}
+])
+
+
+.controller('pendingexchangesCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		$scope.showUserRequestExchange = function () {
+			Loader.showLoading();
+		    $scope.loading = true;
+		    gapi.client.libreriapp.showUserRequestExchange().execute(function(resp) {
+		    	$scope.$apply(function () {
+		    		if (!resp.code) {
+		                resp.items = resp.items || [];
+		                
+		                
+		                $scope.thebooks6 = [];
+		                $scope.justtest = resp.items;
+		                angular.forEach(resp.items, function(book) {
+		                	$scope.thebooks6.push(book);
+		                });
+		                
+		                //$scope.$apply();
+		                Loader.hideLoading();
+		    		}
+		    	});                   
+		    });
+		};
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+	    	$scope.showUserRequestExchange();
+	    });
+
+	}
+])
+
+
+.controller('bookforpurchaseCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+	
+		var myVar = $state.params.bookId;
+		
+		$scope.bookId = {
+			"bookId": myVar
+		};
+		
+		$scope.listOneBook = function () {
+	        $scope.submitted = true;
+	        $scope.loading = true;
+	        
+	        $scope.tmp = myVar;
+	        
+	        gapi.client.libreriapp.listOneBook($scope.bookId).execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+	                        $scope.book = resp.result;
+	                }else {
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        	});
+	        });
+	    };
+	    
+	    $scope.confirm = function () {
+	    	
+	    	$scope.transaction = {
+	    		"bookId": myVar,
+	    		"confirm": true
+	    	};
+	    	
+	        gapi.client.libreriapp.confirmPurchase($scope.transaction).execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+                        //No retorna
+                		Loader.toggleLoadingWithMessage('Transferencia realizada!',2000);
+                		$state.go('app.browse');
+	                }else {
+	                	Loader.toggleLoadingWithMessage('Error!',2000);
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        	});
+	        });
+	    };
+	    
+	    $scope.cancel = function () {  
+	    	
+	    	$scope.transaction = {
+	    		"bookId": myVar,
+	    		"confirm": false
+	    	};
+	    	
+	        gapi.client.libreriapp.confirmPurchase($scope.transaction).execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+	                	//No retorna
+                		Loader.toggleLoadingWithMessage('Transferencia cancelada!',2000);
+                		$state.go('app.browse');
+	                }else {
+	                	Loader.toggleLoadingWithMessage('Error!',2000);
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        	});
+	        });
+	    };
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.listOneBook();
+        });
+
+	}
+])
+
+.controller('bookforexchangeCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+	
+		var myVar = $state.params.bookId;
+		
+		$scope.bookId = {
+			"bookId": myVar
+		};
+		
+		$scope.listOneBook = function () {
+	        $scope.submitted = true;
+	        $scope.loading = true;
+	        
+	        $scope.tmp = myVar;
+	        
+	        gapi.client.libreriapp.listOneBook($scope.bookId).execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+	                        $scope.book = resp.result;
+	                }else {
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        	});
+	        });
+	    };
+	    
+	    $scope.confirm = function () {
+	    	
+	    	$scope.transaction = {
+	    		"bookId": myVar,
+	    		"confirm": true
+	    	};
+	    	
+	        gapi.client.libreriapp.confirmExchange($scope.transaction).execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+	                    //No retorna
+	            		Loader.toggleLoadingWithMessage('Transferencia realizada!',2000);
+	            		$state.go('app.browse');
+	                }else {
+	                	Loader.toggleLoadingWithMessage('Error!',2000);
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        	});
+	        });
+	    };
+	    
+	    $scope.cancel = function () {  
+	    	
+	    	$scope.transaction = {
+	    		"bookId": myVar,
+	    		"confirm": false
+	    	};
+	    	
+	        gapi.client.libreriapp.confirmExchange($scope.transaction).execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+	                	//No retorna
+	            		Loader.toggleLoadingWithMessage('Transferencia cancelada!',2000);
+	            		$state.go('app.browse');
+	                }else {
+	                	Loader.toggleLoadingWithMessage('Error!',2000);
+	                	var errorMessage = resp.error.message || '';
+	                    $scope.messages = 'Failed to query the conferences created : ' + errorMessage;
+	                    $scope.alertStatus = 'warning';
+	                    $log.error($scope.messages);
+	                }
+	        	});
+	        });
+	    };
+		
+		$scope.$on('$ionicView.beforeEnter', function(){
+	    	$scope.listOneBook();
+	    });
+	}
+])
+
+
+.controller('profileCtrl', ['$scope','$state', 'LSFactory', 'AuthFactory', 'UserFactory', 'Loader', 'oauth2Provider',
+	function($scope, $state, LSFactory, AuthFactory, UserFactory, Loader, oauth2Provider) {
+
+		$scope.loadProfile = function () {
+	        gapi.client.libreriapp.getPerson().execute(function(resp) {
+	        	$scope.$apply(function () {
+	                if (!resp.code) {
+	                        $scope.name = resp.result.name;
+	                        $scope.email = resp.result.email;
+	                        $scope.urlPicture = resp.result.urlPicture;
+	                        
+	                        $scope.reputation = resp.result.reputation;
+	                        $scope.points = resp.result.points;
+	                }else {
+	                	Loader.toggleLoadingWithMessage('Se ha producido un error!',2000);
+	                }
+	        	});
+	        });
+	    };
+	    
+	    $scope.$on('$ionicView.beforeEnter', function(){
+        	$scope.loadProfile();
+        });
 	}
 ]);

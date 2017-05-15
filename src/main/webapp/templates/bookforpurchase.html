@@ -1,0 +1,43 @@
+<ion-nav-bar class="bar-assertive">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="listOneBook()"></a>
+	</ion-nav-buttons>
+</ion-nav-bar>
+
+<ion-view view-title="Confirmar compra de este libro" hide-back-button="true">
+	<ion-nav-buttons side="right">
+		<a class="button button-icon button-clear ion-refresh" ng-click="listOneBook()"></a>
+	</ion-nav-buttons>
+	<ion-content>
+		<div class="list card">
+			<div class="item item-avatar">			
+				<!-- <h2>{{tmp}}</h2> 
+				<img ng-src="#"> -->
+				<h2>{{::book.name}}</h2>
+				<p>{{::book.author}}</p>
+			</div>
+			<div class="item item-body">
+				<img class="full-image" ng-src="https://escritoradebolsillo.files.wordpress.com/2015/06/librosss.jpg">
+				<p>
+					{{::book.description}}
+				</p>
+				<p class="row">
+					<label class="col">
+						Email comprador: <label class="subdued">email@email.com</label>
+					</label>
+					<label class="col">
+						Precio de referencia: <label class="subdued">{{::book.price}} $</label>
+					</label>
+				</p>
+				
+				<button class="button button-icon button-assertive button-block ion-checkmark" ng-hide="!isAuthenticated" ng-click="confirm()">
+					Confirmar
+				</button>
+				
+				<button class="button button-icon button-assertive button-block ion-close-round" ng-hide="!isAuthenticated" ng-click="cancel()">
+					Cancelar
+				</button>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>
