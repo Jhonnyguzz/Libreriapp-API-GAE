@@ -110,8 +110,10 @@ public class LibreriappApi
         
         System.out.println(books.size());
         
+        int tam = books.size();
+        
         //This is just a test
-    	for (int i = 0; i < books.size(); i++) 
+    	for (int i = 0; i < tam; i++) 
     	{
     		//Filtrado, porque con objectify no quiso servir
     		if(!books.get(i).isAvailable())
